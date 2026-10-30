@@ -2,7 +2,8 @@
 tensorflow>=2.15.0,<2.18
 tf2onnx>=1.16.0,<1.17
 onnx>=1.15.0,<1.17
-opencv-python>=4.9.0,<4.11
+onnxruntime>=1.17.0,<1.20
+opencv-python-headless>=4.9.0,<4.11
 numpy>=1.26.0,<2.0
 pandas>=2.0.0,<3.0
 scikit-learn>=1.4.0,<1.6

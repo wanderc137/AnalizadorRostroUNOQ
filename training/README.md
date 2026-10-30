@@ -56,7 +56,32 @@ python train_utkface.py --download --dataset-dir data/utkface --epochs 50
 kaggle datasets download -d jangedoo/utkface-new -p data --unzip
 ```
 
-## 2. Entorno en Colab
+## 2. Entrenamiento en GitHub Actions (sin instalar en tu PC)
+
+El workflow `.github/workflows/train-utkface.yml` entrena en un runner Ubuntu
+de GitHub Actions, descarga UTKFace desde Hugging Face, exporta el ONNX y lo
+publica como artifact. No requiere GPU ni TensorFlow local.
+
+1. En GitHub: **Actions → Entrenar UTKFace (genero + edad) → Run workflow**.
+2. Parámetros recomendados para CPU (6 h máximo): `epochs=6`,
+   `batch_size=64`, `fine_tune_epochs=0`.
+3. Al terminar, descarga el artifact `utkface-onnx` y copia
+   `utkface_mobilenetv2.onnx` a `models/`.
+4. Verifica el SHA256 y el tamaño antes de desplegar a la UNO Q.
+
+También se puede lanzar por CLI:
+
+```bash
+gh workflow run train-utkface.yml -f epochs=6 -f batch_size=64 -f fine_tune_epochs=0
+gh run watch
+gh run download --name utkface-onnx
+```
+
+El workflow valida el ONNX con `onnxruntime` y con `cv2.dnn` (entrada NCHW
+`1×3×224×224`, salidas `gender` y `age`). El dataset **no** se sube al repo:
+se descarga en el runner por su licencia de uso académico.
+
+## 3. Entorno en Colab
 
 ```python
 !pip install -r requirements-train.txt
@@ -71,7 +96,7 @@ import os
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
 ```
 
-## 3. Pipeline del script
+## 4. Pipeline del script
 
 1. Parseo tolerante de nombres (`timestamp` de 13–17 dígitos, sufijos
    `.chip.jpg`) y filtrado de imágenes corruptas (OpenCV en modo reducido).
@@ -94,19 +119,21 @@ os.environ["TF_USE_LEGACY_KERAS"] = "1"
    (`--fine-tune-epochs`, `--fine-tune-layers`).
 8. Métricas de test: accuracy por cabeza, `classification_report` y matriz de
    confusión de edad (`evaluation.json`, `confusion_matrix.png`).
-9. Exportación ONNX opset 13 con salidas `gender` y `age`.
+9. Exportación ONNX opset 13 con entrada NCHW (`1×3×224×224`), `Transpose` interno a NHWC y salidas `gender` y `age`.
 
-## 4. Contrato de inferencia (crítico)
+## 5. Contrato de inferencia (crítico)
 
 - **Entrada**: RGB 224×224, normalizada `x / 127.5 - 1` (equivalente a
   `blobFromImage(face, 1/127.5, (224,224), (127.5,127.5,127.5), swapRB=True)`).
+- **Layout ONNX**: NCHW (`1×3×224×224`), exactamente el blob de OpenCV. El
+  `Transpose` a NHWC queda dentro del ONNX; no cambies el preprocesado de la app.
 - **Salida `gender`**: sigmoide de 1 valor → `0` = Masculino, `1` = Femenino.
 - **Salida `age`**: softmax de 8 valores en el orden de `AGE_BUCKETS`.
 
 Si cambias los buckets aquí, actualiza `AGE_BUCKETS` en `.env` /
 `app/config.py`; si no, las etiquetas dejarán de tener sentido.
 
-## 5. Llevar el modelo a la UNO Q
+## 6. Llevar el modelo a la UNO Q
 
 ```bash
 # Desde el host de desarrollo
@@ -121,7 +148,7 @@ cd /home/arduino/ArduinoApps/AnalizadorRostroUNOQ
 MODEL_BACKEND=utkface_onnx ./scripts/run.sh
 ```
 
-## 6. Notas de rendimiento
+## 7. Notas de rendimiento
 
 - El MPU QRB2210 no tiene GPU usable por OpenCV DNN: la inferencia ONNX corre
   en CPU. A 224×224 MobileNetV2 tarda decenas de ms por rostro.

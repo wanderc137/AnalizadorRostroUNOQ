@@ -416,17 +416,124 @@ def ensure_onnx_output_names(path: Path) -> List[str]:
     return final
 
 
+def _build_nchw_export_model(model):
+    """Envuelve el modelo NHWC con una entrada NCHW para OpenCV DNN.
+
+    La app usa ``cv2.dnn.blobFromImage``, que produce un blob NCHW
+    ``(1, 3, 224, 224)``. El modelo Keras entrena con NHWC, así que se
+    inserta un ``Transpose`` interno al exportar. De este modo el ONNX
+    acepta exactamente el tensor que genera la app sin tocar su código.
+    """
+    import tensorflow as tf
+
+    nchw_input = tf.keras.Input(
+        shape=(3, IMG_SIZE[0], IMG_SIZE[1]), name="input"
+    )
+    nhwc = tf.transpose(nchw_input, perm=(0, 2, 3, 1))
+    outputs = model(nhwc, training=False)
+    return tf.keras.Model(
+        inputs=nchw_input,
+        outputs=outputs,
+        name="utkface_nchw_export",
+    )
+
+
+def _onnx_shape(value_info) -> List[int]:
+    return [dim.dim_value for dim in value_info.type.tensor_type.shape.dim]
+
+
+def validate_onnx_model(path: Path) -> bool:
+    """Valida la entrada NCHW, las salidas y una inferencia real.
+
+    Falla con ``RuntimeError`` si el ONNX no es compatible con la app.
+    Si ``onnxruntime`` no está instalado, valida la estructura con ``onnx``
+    y omite la inferencia (en GitHub Actions sí se instala).
+    """
+    import numpy as np
+    import onnx
+
+    model = onnx.load(str(path))
+    onnx.checker.check_model(model)
+
+    if len(model.graph.input) != 1:
+        raise RuntimeError(
+            f"El ONNX debe tener una entrada, tiene {len(model.graph.input)}."
+        )
+    input_dims = _onnx_shape(model.graph.input[0])
+    if len(input_dims) != 4 or input_dims[1:] != [3, IMG_SIZE[0], IMG_SIZE[1]]:
+        raise RuntimeError(
+            f"Entrada ONNX inesperada {input_dims}; se esperaba [N,3,"
+            f"{IMG_SIZE[0]},{IMG_SIZE[1]}] (NCHW)."
+        )
+
+    output_dims = {out.name: _onnx_shape(out) for out in model.graph.output}
+    if set(output_dims) != {"gender", "age"}:
+        raise RuntimeError(
+            f"Salidas ONNX inesperadas {sorted(output_dims)}; "
+            "se esperaban exactamente 'gender' y 'age'."
+        )
+    if output_dims["gender"][-1] != 1:
+        raise RuntimeError(
+            f"Salida 'gender' con forma {output_dims['gender']}; se esperaba 1."
+        )
+    if output_dims["age"][-1] != len(AGE_BUCKETS):
+        raise RuntimeError(
+            f"Salida 'age' con forma {output_dims['age']}; se esperaban "
+            f"{len(AGE_BUCKETS)} clases."
+        )
+
+    try:
+        import onnxruntime as ort
+    except ImportError:
+        print(
+            "Aviso: onnxruntime no está instalado; se omite la inferencia "
+            "de validación del ONNX."
+        )
+        return True
+
+    session = ort.InferenceSession(str(path), providers=["CPUExecutionProvider"])
+    input_name = session.get_inputs()[0].name
+    dummy = np.random.default_rng(0).uniform(
+        -1.0, 1.0, (1, 3, IMG_SIZE[0], IMG_SIZE[1])
+    ).astype(np.float32)
+    values = session.run(None, {input_name: dummy})
+    result = {
+        output.name: value for output, value in zip(session.get_outputs(), values)
+    }
+    if result["gender"].shape[-1] != 1:
+        raise RuntimeError(
+            f"Inferencia gender con forma {result['gender'].shape}; se esperaba 1."
+        )
+    if result["age"].shape[-1] != len(AGE_BUCKETS):
+        raise RuntimeError(
+            f"Inferencia age con forma {result['age'].shape}; se esperaban "
+            f"{len(AGE_BUCKETS)} clases."
+        )
+    if not np.isfinite(result["gender"]).all() or not np.isfinite(result["age"]).all():
+        raise RuntimeError("El ONNX produjo valores no finitos en la validación.")
+    print(
+        "ONNX validado: entrada "
+        f"{input_dims}, gender {tuple(result['gender'].shape)}, "
+        f"age {tuple(result['age'].shape)}"
+    )
+    return True
+
+
 def export_onnx(model, output_path: Path) -> Path:
     import tensorflow as tf
     import tf2onnx
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    # Entrada NCHW: es el layout que produce cv2.dnn.blobFromImage en la app.
     signature = (
-        tf.TensorSpec((None, IMG_SIZE[0], IMG_SIZE[1], 3), tf.float32, name="input"),
+        tf.TensorSpec(
+            (None, 3, IMG_SIZE[0], IMG_SIZE[1]), tf.float32, name="input"
+        ),
     )
+    export_model = _build_nchw_export_model(model)
     try:
         tf2onnx.convert.from_keras(
-            model,
+            export_model,
             input_signature=signature,
             opset=13,
             output_path=str(output_path),
@@ -435,13 +542,15 @@ def export_onnx(model, output_path: Path) -> Path:
         print(f"Exportación directa falló ({exc}); reintentando con el modelo congelado...")
         frozen = tf.keras.models.clone_model(model)
         frozen.set_weights(model.get_weights())
+        export_model = _build_nchw_export_model(frozen)
         tf2onnx.convert.from_keras(
-            frozen,
+            export_model,
             input_signature=signature,
             opset=13,
             output_path=str(output_path),
         )
     ensure_onnx_output_names(output_path)
+    validate_onnx_model(output_path)
     print(f"ONNX listo: {output_path} ({output_path.stat().st_size / 1e6:.1f} MB)")
     return output_path
 
