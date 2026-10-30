@@ -1,0 +1,10 @@
+# Dependencias de entrenamiento (Colab / PC). NO se instalan en la UNO Q.
+tensorflow>=2.15.0,<2.18
+tf2onnx>=1.16.0,<1.17
+onnx>=1.15.0,<1.17
+opencv-python>=4.9.0,<4.11
+numpy>=1.26.0,<2.0
+pandas>=2.0.0,<3.0
+scikit-learn>=1.4.0,<1.6
+matplotlib>=3.8.0,<4.0
+kaggle>=1.6.0,<1.7

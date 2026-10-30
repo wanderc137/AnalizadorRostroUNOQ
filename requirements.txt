@@ -1,0 +1,8 @@
+# Runtime en la UNO Q (MPU Linux, ARM64). Ver scripts/setup_board.sh
+fastapi>=0.115.0,<0.116
+uvicorn>=0.30.0,<0.31
+opencv-python-headless>=4.9.0,<4.11
+numpy>=1.26.0,<2.0
+Pillow>=10.0.0,<11.0
+python-dotenv>=1.0.0,<2.0
+python-multipart>=0.0.9,<0.1

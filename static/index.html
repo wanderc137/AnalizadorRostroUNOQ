@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0d12">
+  <title>Analizador de Rostros · Arduino UNO Q</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div class="brand-text">
+        <h1>Analizador de Rostros</h1>
+        <p>Arduino UNO Q · MPU Linux · inferencia local</p>
+      </div>
+    </div>
+    <div class="badges" aria-live="polite">
+      <span id="badge-camera" class="badge badge--idle">Cámara…</span>
+      <span id="badge-model" class="badge badge--idle">Modelo…</span>
+      <span id="badge-fps" class="badge badge--idle">FPS 0.0</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="card stage">
+      <div class="video-wrap">
+        <img id="stream" alt="Vídeo en vivo de la cámara con rostros detectados">
+        <div id="stream-overlay" class="stream-overlay">Conectando con la cámara…</div>
+        <div class="hud">
+          <div class="hud-stat">
+            <span id="faces-count">0</span>
+            <small>rostros</small>
+          </div>
+          <div class="hud-stat hud-stat--muted">
+            <span id="hud-fps">0.0</span>
+            <small>FPS</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="btn-start" class="btn btn--primary" type="button">Iniciar cámara</button>
+        <button id="btn-stop" class="btn btn--ghost" type="button">Detener</button>
+        <button id="btn-snapshot" class="btn btn--ghost" type="button" hidden>Snapshot</button>
+      </div>
+
+      <label id="auth-row" class="auth-row" hidden
+             title="Requerido para iniciar/detener la cámara y guardar snapshots cuando API_TOKEN está definido">
+        <span>Token API</span>
+        <input id="api-token" type="password" autocomplete="off"
+               placeholder="Header X-Api-Token" aria-label="Token de API">
+      </label>
+    </section>
+
+    <aside class="card panel">
+      <h2>Estado del sistema</h2>
+      <dl class="status-grid">
+        <div><dt>Cámara</dt><dd id="status-camera">—</dd></div>
+        <div><dt>Backend</dt><dd id="status-backend">—</dd></div>
+        <div><dt>Modelo</dt><dd id="status-model">—</dd></div>
+        <div><dt>Resolución</dt><dd id="status-resolution">—</dd></div>
+        <div><dt>Inferencia</dt><dd id="status-infer">—</dd></div>
+        <div><dt>FPS</dt><dd id="status-fps">—</dd></div>
+      </dl>
+
+      <p id="status-message" class="message">Iniciando…</p>
+
+      <div class="legend">
+        <h3>Cómo funciona</h3>
+        <p>
+          Un único worker captura la cámara, detecta rostros con el clasificador
+          Haar y clasifica género y rango de edad cada
+          <strong id="legend-every">5</strong> frames. El vídeo llega por MJPEG a
+          todos los clientes sin duplicar la inferencia.
+        </p>
+      </div>
+
+      <div class="api-note">
+        <span>API</span>
+        <code>GET /api/status</code>
+        <code>GET /api/config</code>
+        <code>POST /api/snapshot</code>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <p class="privacy">
+      Esta aplicación procesa rostros localmente en la Arduino UNO Q.
+      No se guardan imágenes a menos que actives el snapshot.
+    </p>
+    <p class="meta">AnalizadorRostroUNOQ v1.0 · STM32U585 no interviene en la inferencia</p>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

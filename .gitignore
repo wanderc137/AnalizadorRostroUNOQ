@@ -1,0 +1,41 @@
+# Documentos internos del pipeline
+PLAN.md
+AUDIT_REPORT.md
+
+# Configuración con posibles secretos
+.env
+
+# Entornos virtuales
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Modelos (no se versionan)
+models/*.onnx
+models/*.h5
+models/*.keras
+models/*.tflite
+models/fallback/
+
+# Dataset y artefactos de entrenamiento
+dataset/
+training/data/
+training/output/
+
+# Snapshots de rostros (datos biométricos)
+snapshots/
+
+# Modelos Caffe
+*.caffemodel
+
+# Build / sistema
+build/
+.arduino/
+*.log
+*.jpg.tmp
+.DS_Store
