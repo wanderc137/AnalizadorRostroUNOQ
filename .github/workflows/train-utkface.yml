@@ -28,7 +28,6 @@ jobs:
     timeout-minutes: 360
     env:
       TF_CPP_MIN_LOG_LEVEL: "2"
-      TF_USE_LEGACY_KERAS: "1"
       PYTHONUNBUFFERED: "1"
       EPOCHS: ${{ github.event.inputs.epochs || '6' }}
       BATCH_SIZE: ${{ github.event.inputs.batch_size || '64' }}
@@ -70,6 +69,7 @@ jobs:
             "https://huggingface.co/datasets/nlphuji/utk_faces/resolve/main/utk_faces_images.zip"
           unzip -q training/data/utk_faces_images.zip -d training/data/utkface_raw
           find training/data/utkface_raw -type f \
+            -not -path '*/__MACOSX/*' -not -name '._*' \
             \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) \
             -exec cp -t training/data/utkface {} +
           count=$(find training/data/utkface -type f | wc -l)
