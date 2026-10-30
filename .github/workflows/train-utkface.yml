@@ -15,6 +15,9 @@ on:
         description: "Epocas de fine-tuning (0 = desactivado)"
         required: false
         default: "0"
+  push:
+    paths:
+      - "training/.train-utkface-trigger"
 
 permissions:
   contents: read
@@ -27,6 +30,9 @@ jobs:
       TF_CPP_MIN_LOG_LEVEL: "2"
       TF_USE_LEGACY_KERAS: "1"
       PYTHONUNBUFFERED: "1"
+      EPOCHS: ${{ github.event.inputs.epochs || '6' }}
+      BATCH_SIZE: ${{ github.event.inputs.batch_size || '64' }}
+      FINE_TUNE_EPOCHS: ${{ github.event.inputs.fine_tune_epochs || '0' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -75,9 +81,9 @@ jobs:
           set -euo pipefail
           python training/train_utkface.py \
             --dataset-dir training/data/utkface \
-            --epochs "${{ inputs.epochs }}" \
-            --fine-tune-epochs "${{ inputs.fine_tune_epochs }}" \
-            --batch-size "${{ inputs.batch_size }}" \
+            --epochs "${EPOCHS}" \
+            --fine-tune-epochs "${FINE_TUNE_EPOCHS}" \
+            --batch-size "${BATCH_SIZE}" \
             --learning-rate 0.001 \
             --patience 3 \
             --no-validate \

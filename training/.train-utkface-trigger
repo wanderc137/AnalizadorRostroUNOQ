@@ -1,0 +1,3 @@
+Disparador manual del workflow de entrenamiento UTKFace.
+Tocar este archivo (push) ejecuta .github/workflows/train-utkface.yml.
+No contiene datos: el dataset se descarga en el runner de GitHub Actions.
