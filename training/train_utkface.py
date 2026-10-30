@@ -78,6 +78,16 @@ def bucket_for_age(age: int, buckets: Sequence[str]) -> int:
     return len(buckets) - 1
 
 
+def bucketize_ages(ages: Sequence[int], buckets: Sequence[str]) -> List[int]:
+    """Convierte edades crudas de UTKFace (0-120) a índices de bucket 0-7.
+
+    Es la única fuente de verdad para las etiquetas de edad. No usar
+    ``tf.one_hot(edad_cruda)`` directamente: una edad como 26 produciría un
+    vector todo-cero con ``depth=8`` y arruinaría el entrenamiento.
+    """
+    return [bucket_for_age(int(age), buckets) for age in ages]
+
+
 def _clean_stem(path: Path) -> str:
     """Normaliza el stem quitando extensiones y sufijos tipo ``.chip``.
 
@@ -124,7 +134,7 @@ SELF_TEST_CASES: Sequence[Tuple[str, Tuple[int, int] | None]] = (
 
 
 def run_self_test(verbose: bool = True) -> bool:
-    """Valida el parser con nombres reales de UTKFace y sufijos ``.chip.jpg``."""
+    """Valida el parser y la bucketización de edad sin requerir TensorFlow."""
     failures: List[str] = []
     for name, expected in SELF_TEST_CASES:
         got = parse_filename(Path(name))
@@ -132,6 +142,15 @@ def run_self_test(verbose: bool = True) -> bool:
             failures.append(f"{name}: esperado {expected}, obtenido {got}")
         elif verbose:
             print(f"  OK  {name} -> {got}")
+    edge_ages = [0, 2, 3, 9, 10, 19, 20, 29, 30, 39, 40, 49, 50, 59, 60, 116]
+    edge_expected = [0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7]
+    got_buckets = bucketize_ages(edge_ages, AGE_BUCKETS)
+    if got_buckets != edge_expected:
+        failures.append(
+            f"bucketize_ages: esperado {edge_expected}, obtenido {got_buckets}"
+        )
+    elif verbose:
+        print(f"  OK  bucketize_ages ({len(edge_ages)} bordes) -> {got_buckets}")
     if failures:
         print("Self-test del parser FALLÓ:", file=sys.stderr)
         for failure in failures:
@@ -260,6 +279,10 @@ def build_datasets(split, buckets, batch_size: int, seed: int):
     import tensorflow as tf
 
     autotune = tf.data.AUTOTUNE
+    # LUT edad cruda (0-120) -> índice de bucket (0-7). Las etiquetas de edad
+    # NO son edades crudas: sin este mapeo, tf.one_hot(26, depth=8) es un
+    # vector todo-cero y el entrenamiento de edad colapsa.
+    age_lut = tf.constant(bucketize_ages(range(121), buckets), dtype=tf.int32)
 
     def make_loader(num_buckets: int):
         def load(path, gender, age):
@@ -269,9 +292,10 @@ def build_datasets(split, buckets, batch_size: int, seed: int):
             image = tf.cast(image, tf.float32)
             # Misma normalización que la inferencia: x / 127.5 - 1
             image = image / 127.5 - 1.0
+            age_index = tf.gather(age_lut, tf.cast(age, tf.int32))
             labels = {
                 "gender": tf.cast(gender, tf.float32),
-                "age": tf.one_hot(tf.cast(age, tf.int32), num_buckets),
+                "age": tf.one_hot(age_index, num_buckets),
             }
             return image, labels
 

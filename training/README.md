@@ -63,7 +63,7 @@ de GitHub Actions, descarga UTKFace desde Hugging Face, exporta el ONNX y lo
 publica como artifact. No requiere GPU ni TensorFlow local.
 
 1. En GitHub: **Actions → Entrenar UTKFace (genero + edad) → Run workflow**.
-2. Parámetros recomendados para CPU (6 h máximo): `epochs=6`,
+2. Parámetros recomendados para CPU (6 h máximo): `epochs=10`,
    `batch_size=64`, `fine_tune_epochs=0`.
 3. Al terminar, descarga el artifact `utkface-onnx` y copia
    `utkface_mobilenetv2.onnx` a `models/`.
@@ -72,7 +72,7 @@ publica como artifact. No requiere GPU ni TensorFlow local.
 También se puede lanzar por CLI:
 
 ```bash
-gh workflow run train-utkface.yml -f epochs=6 -f batch_size=64 -f fine_tune_epochs=0
+gh workflow run train-utkface.yml -f epochs=10 -f batch_size=64 -f fine_tune_epochs=0
 gh run watch
 gh run download --name utkface-onnx
 ```
@@ -101,7 +101,10 @@ os.environ["TF_USE_LEGACY_KERAS"] = "1"
 1. Parseo tolerante de nombres (`timestamp` de 13–17 dígitos, sufijos
    `.chip.jpg`) y filtrado de imágenes corruptas (OpenCV en modo reducido).
 2. Bucketización de edad a las **8 clases fijas** (deben coincidir con
-   `AGE_BUCKETS` de `app/config.py`):
+   `AGE_BUCKETS` de `app/config.py`). La edad cruda 0-120 se mapea primero a
+   un índice 0-7 con `bucketize_ages()`; recién entonces se aplica `one_hot`.
+   Aplicar `one_hot` sobre la edad cruda produce vectores todo-cero para
+   edades ≥ 8 y arruina el entrenamiento:
 
    `0-2`, `3-9`, `10-19`, `20-29`, `30-39`, `40-49`, `50-59`, `60+`
 

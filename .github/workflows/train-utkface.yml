@@ -6,7 +6,7 @@ on:
       epochs:
         description: "Epocas de cabeza (head-only)"
         required: false
-        default: "6"
+        default: "10"
       batch_size:
         description: "Batch size"
         required: false
@@ -29,7 +29,7 @@ jobs:
     env:
       TF_CPP_MIN_LOG_LEVEL: "2"
       PYTHONUNBUFFERED: "1"
-      EPOCHS: ${{ github.event.inputs.epochs || '6' }}
+      EPOCHS: ${{ github.event.inputs.epochs || '10' }}
       BATCH_SIZE: ${{ github.event.inputs.batch_size || '64' }}
       FINE_TUNE_EPOCHS: ${{ github.event.inputs.fine_tune_epochs || '0' }}
     steps:
@@ -84,7 +84,7 @@ jobs:
             --epochs "${EPOCHS}" \
             --fine-tune-epochs "${FINE_TUNE_EPOCHS}" \
             --batch-size "${BATCH_SIZE}" \
-            --learning-rate 0.001 \
+            --learning-rate 0.0003 \
             --patience 3 \
             --no-validate \
             --output-dir training/output
