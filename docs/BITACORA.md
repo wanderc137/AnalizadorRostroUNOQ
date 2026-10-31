@@ -113,13 +113,16 @@ ssh -v "${UNOQ_USER:-arduino}@${UNOQ_HOST}"
 
 ---
 
-### P-04 — Modelo ONNX inexistente
+### P-04 — Modelo ONNX ausente al inicio (resuelto en v1.0.0)
 
-**Situación:** el backend `utkface_onnx` requiere `models/utkface_mobilenetv2.onnx`, que **no existe** en el repositorio (es un artefacto de entrenamiento, excluido por `.gitignore`).
+**Situación inicial:** el backend `utkface_onnx` requiere `models/utkface_mobilenetv2.onnx`, que no existía; es un artefacto de entrenamiento excluido por `.gitignore`.
 
-**Solución de diseño**
+**Solución aplicada**
 
-- `MODEL_BACKEND=auto` intenta ONNX y cae a Caffe.
+- Se entrenó MobileNetV2 con UTKFace en GitHub Actions (10 épocas, CPU) y se exportó el ONNX NCHW.
+- Métricas de test: género 84.56 %, edad exacta 48.17 %, edad ±1 bucket 83.8 %.
+- El modelo se publicó como asset del release `v1.0.0` y se descarga con `scripts/download_model.sh` (verifica SHA256).
+- `MODEL_BACKEND=auto` prefiere ONNX y cae a Caffe si no está.
 - Si ninguno existe, la app **no crashea**: modo degradado con detección Haar y etiqueta `Rostro detectado | modelo no cargado`.
 - `/api/status` expone `model_error` para saber exactamente qué falta.
 
@@ -424,6 +427,9 @@ En bash, cita siempre variables, incluso cuando "sabes" que no tienen espacios.
 | Sintaxis bash | `bash -n scripts/*.sh` | OK. |
 | Sintaxis JS | `node --check static/app.js` | OK. |
 | Self-test parser UTKFace | `python3 training/train_utkface.py --self-test` | 9/9 OK. |
+| Entrenamiento UTKFace | GitHub Actions run `41117352948` | **SUCCESS**: género 84.56 %, edad exacta 48.17 %, ±1 bucket 83.8 %. |
+| ONNX NCHW | Validación del workflow + OpenCV DNN | Entrada `[1,3,224,224]`, salidas `gender (1,1)` y `age (1,8)`. |
+| Release v1.0.0 | `scripts/download_model.sh --force` | Descarga y SHA256 `390ade...` verificados. |
 | Auditoría estática | Revisión de código | 9/9 incidencias resueltas; 0 nuevas. |
 | `adb devices` | En el host de documentación | **Vacío** (sin dispositivos). |
 | Ejecución en placa | — | **No realizada**. |
@@ -469,7 +475,7 @@ En bash, cita siempre variables, incluso cuando "sabes" que no tienen espacios.
 
 ### Mejoras deseables
 
-5. Entrenar el ONNX UTKFace y validar precisión en condiciones reales.
+5. Validar el ONNX UTKFace en condiciones reales de cámara e iluminación.
 6. Migrar la detección a YuNet para perfiles y luz difícil.
 7. Añadir tracking con IDs para estabilizar etiquetas.
 8. Proteger `/video` con proxy inverso si se despliega fuera de una LAN de confianza.

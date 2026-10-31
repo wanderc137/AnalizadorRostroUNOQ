@@ -3,8 +3,25 @@
 Script `train_utkface.py`: entrena MobileNetV2 con dos cabezas sobre UTKFace y
 exporta un ONNX (opset 13) listo para `models/utkface_mobilenetv2.onnx`.
 
-> Este entrenamiento **no se ejecuta en la Arduino UNO Q**. Usa Google Colab
-> (GPU gratuita) o un PC con GPU/CPU moderna.
+> Este entrenamiento **no se ejecuta en la Arduino UNO Q**. Usa GitHub Actions
+> (CPU gratuita), Google Colab (GPU gratuita) o un PC con GPU/CPU moderna.
+
+## 0. Modelo ya entrenado (v1.0.0)
+
+No necesitas reentrenar para usar la app. El modelo está publicado en el release
+`v1.0.0` y se descarga con verificación de SHA256:
+
+```bash
+./scripts/download_model.sh
+```
+
+- **Asset:** `utkface_mobilenetv2.onnx` (10.211.778 bytes).
+- **SHA256:** `390ade0e1f237616aca4636976f3223f1b8396e4bb539c27a4b55848a30c1661`.
+- **Test UTKFace (2.371 imágenes):** género 84.56 %, edad exacta 48.17 %,
+  edad ±1 bucket 83.8 %.
+- **Entrada:** NCHW `[N,3,224,224]`; salidas `gender` (1) y `age` (8).
+
+Las secciones siguientes documentan cómo se generó y cómo reentrenarlo.
 
 ## 1. Dataset
 
@@ -66,8 +83,12 @@ publica como artifact. No requiere GPU ni TensorFlow local.
 2. Parámetros recomendados para CPU (6 h máximo): `epochs=10`,
    `batch_size=64`, `fine_tune_epochs=0`.
 3. Al terminar, descarga el artifact `utkface-onnx` y copia
-   `utkface_mobilenetv2.onnx` a `models/`.
+   `utkface_mobilenetv2.onnx` a `models/`, o publica un release con
+   `gh release create`.
 4. Verifica el SHA256 y el tamaño antes de desplegar a la UNO Q.
+
+> Ejecución de referencia: run `41117352948` (commit `5ced197`), 10 épocas,
+> ~37 min, **SUCCESS**. Género 84.56 %, edad exacta 48.17 %, ±1 bucket 83.8 %.
 
 También se puede lanzar por CLI:
 
@@ -139,9 +160,13 @@ Si cambias los buckets aquí, actualiza `AGE_BUCKETS` en `.env` /
 ## 6. Llevar el modelo a la UNO Q
 
 ```bash
-# Desde el host de desarrollo
-cp output/utkface_mobilenetv2.onnx ../models/utkface_mobilenetv2.onnx
-./scripts/deploy_unoq.sh --models       # copia proyecto + modelo por ADB
+# Opción A: descargar el modelo publicado y desplegarlo
+./scripts/download_model.sh
+./scripts/deploy_unoq.sh --adb --setup --model
+
+# Opción B: usar un modelo recién entrenado
+cp training/output/utkface_mobilenetv2.onnx models/utkface_mobilenetv2.onnx
+./scripts/deploy_unoq.sh --adb --setup
 ```
 
 En la placa:
@@ -150,6 +175,10 @@ En la placa:
 cd /home/arduino/ArduinoApps/AnalizadorRostroUNOQ
 MODEL_BACKEND=utkface_onnx ./scripts/run.sh
 ```
+
+`--model` descarga el ONNX en el host antes de copiar; `models/` viaja completo
+en la transferencia. También puedes ejecutar en la placa
+`bash scripts/setup_board.sh --with-model` si tiene internet.
 
 ## 7. Notas de rendimiento
 
