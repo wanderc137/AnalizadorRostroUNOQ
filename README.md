@@ -41,7 +41,7 @@ Aplicación **Python / FastAPI** que corre en el **MPU Linux (Qualcomm QRB2210, 
 | Código de la aplicación | Completo; auditoría estática **APROBADA sin incidencias** (`AUDIT_REPORT.md`, ciclo 2). |
 | Verificación en host | `py_compile` de todos los módulos, `bash -n` de los scripts, `node --check` del frontend y `train_utkface.py --self-test` (9/9) ejecutados correctamente según `AUDIT_REPORT.md`. |
 | Modelos Caffe fallback | **Presentes localmente** en `models/fallback/` (~88 MB: `age_net.caffemodel` 45.7 MB, `gender_net.caffemodel` 45.6 MB, 2 prototxt). **Excluidos de Git** por `.gitignore`. |
-| Modelo ONNX UTKFace | **No existe todavía.** Debe entrenarse fuera de la placa (Colab/PC) y colocarse en `models/utkface_mobilenetv2.onnx`. Mientras tanto, `MODEL_BACKEND=auto` usa Caffe. |
+| Modelo ONNX UTKFace | **Entrenado (v1.0.0)** con UTKFace y disponible como asset del release. Métricas de test: género **84.56 %**, edad exacta **48.17 %**, edad ±1 bucket **83.8 %**. Se descarga con `scripts/download_model.sh`; no se versiona en Git. `MODEL_BACKEND=auto` lo prefiere sobre Caffe. |
 | Despliegue en hardware | **NO verificado en la placa.** Durante el desarrollo la UNO Q no estuvo accesible: `adb devices` no enumeró dispositivos y SSH agotó el tiempo de espera. Los scripts están listos, pero no se ha confirmado su ejecución real sobre hardware. |
 | Rendimiento real | **No medido en QRB2210.** Las cifras de FPS de esta documentación son objetivos de diseño y recomendaciones de ajuste, no mediciones. |
 
@@ -225,19 +225,33 @@ Modelos Caffe listos en /.../models/fallback
 
 Con `MODEL_BACKEND=auto` (por defecto), la app usará Caffe si no existe el ONNX.
 
-#### Opción B — Modelo propio UTKFace (ONNX, requiere entrenamiento)
+#### Opción B — Modelo propio UTKFace (ONNX, recomendado)
 
-El archivo `models/utkface_mobilenetv2.onnx` **no existe en el repositorio**. Se genera fuera de la placa:
+El modelo ya está entrenado y publicado como asset del release `v1.0.0`:
+
+```bash
+cd AnalizadorRostroUNOQ
+bash scripts/download_model.sh
+# verifica tamaño y SHA256 antes de instalar
+```
+
+- **URL:** <https://github.com/wanderc137/AnalizadorRostroUNOQ/releases/download/v1.0.0/utkface_mobilenetv2.onnx>
+- **SHA256:** `390ade0e1f237616aca4636976f3223f1b8396e4bb539c27a4b55848a30c1661`
+- **Tamaño:** 10,211,778 bytes (~9.8 MB).
+- **Métricas de test (UTKFace, 2,371 imágenes):** género 84.56 %, edad exacta 48.17 %, edad ±1 bucket 83.8 %.
+- **Entrada:** ONNX NCHW `[N,3,224,224]`, normalizada `x/127.5 - 1` con `swapRB=True`.
+
+El `.onnx` **no se versiona** en Git (ver `.gitignore`). Para reentrenarlo:
 
 ```bash
 cd training
 pip install -r requirements-train.txt
-python train_utkface.py --download --epochs 50 --batch-size 32
-# ...
+python train_utkface.py --dataset-dir data/utkface --epochs 10 --batch-size 64 --output-dir output
 cp output/utkface_mobilenetv2.onnx ../models/utkface_mobilenetv2.onnx
 ```
 
-Guía completa: [`training/README.md`](training/README.md).
+También puedes entrenar en GitHub Actions con `.github/workflows/train-utkface.yml`
+(ver [`training/README.md`](training/README.md)).
 
 ### 2. Conectar la cámara
 
@@ -262,7 +276,7 @@ adb devices
 # List of devices attached
 # <serial>    device
 
-./scripts/deploy_unoq.sh --adb --setup
+./scripts/deploy_unoq.sh --adb --setup --model
 ```
 
 El script copia `app`, `python`, `static`, `scripts`, `training`, `models`, `requirements.txt`, `app.yaml` y `.env.example` a `/home/arduino/ArduinoApps/AnalizadorRostroUNOQ`, y luego ejecuta `scripts/setup_board.sh` en la placa.
@@ -275,13 +289,13 @@ El script copia `app`, `python`, `static`, `scripts`, `training`, `models`, `req
 export UNOQ_HOST=192.168.1.50
 export UNOQ_USER=arduino            # valor por defecto del script
 # export UNOQ_SSH_KEY=~/.ssh/unoq_key   # si usas clave
-./scripts/deploy_unoq.sh --ssh --setup
+./scripts/deploy_unoq.sh --ssh --setup --model
 ```
 
 #### Modo automático
 
 ```bash
-./scripts/deploy_unoq.sh --setup
+./scripts/deploy_unoq.sh --setup --model
 ```
 
 Intenta ADB; si falla, usa SSH (solo si `UNOQ_HOST` está definido).
@@ -294,11 +308,11 @@ Si no usaste `--setup`:
 
 ```bash
 adb shell 'cd /home/arduino/ArduinoApps/AnalizadorRostroUNOQ && bash scripts/setup_board.sh'
-# o, si quieres que además descargue Caffe en la placa:
-adb shell 'cd /home/arduino/ArduinoApps/AnalizadorRostroUNOQ && bash scripts/setup_board.sh --with-models'
+# o, si quieres que además descargue el ONNX propio y Caffe en la placa:
+adb shell 'cd /home/arduino/ArduinoApps/AnalizadorRostroUNOQ && bash scripts/setup_board.sh --with-model --with-models'
 ```
 
-`setup_board.sh` es idempotente: crea `.venv`, actualiza `pip`, instala `requirements.txt`, copia `.env.example` → `.env` si falta y, con `--with-models`, descarga Caffe.
+`setup_board.sh` es idempotente: crea `.venv`, actualiza `pip`, instala `requirements.txt`, copia `.env.example` → `.env` si falta y, con `--with-model`, descarga el ONNX UTKFace; con `--with-models`, descarga Caffe. Si el host ya tiene el ONNX, `deploy_unoq.sh --model` lo descarga antes de copiar y lo incluye en la transferencia.
 
 ### 5. Ejecutar
 
@@ -637,18 +651,18 @@ pip install -r requirements-train.txt
 # Autotest del parser de nombres (no requiere TensorFlow)
 python train_utkface.py --self-test
 
-# Entrenamiento (Colab o PC con GPU recomendado)
-python train_utkface.py --download --epochs 50 --batch-size 32 --output-dir output
+# Entrenamiento (GitHub Actions o PC/Colab)
+python train_utkface.py --dataset-dir data/utkface --epochs 10 --batch-size 64 --output-dir output
 ```
 
-- **Dataset:** UTKFace (`jangedoo/utkface-new` en Kaggle), nombres `[edad]_[genero]_[raza]_[timestamp].jpg`.
+- **Dataset:** UTKFace. En GitHub Actions se descarga el zip de `nlphuji/utk_faces`; en local puedes usar Kaggle (`jangedoo/utkface-new`). Nombres `[edad]_[genero]_[raza]_[timestamp].jpg`.
 - **Etiquetas:** edad 0–116 → 8 buckets; género `0` = masculino, `1` = femenino.
 - **Modelo:** MobileNetV2 `include_top=False` + dos cabezas (sigmoide para género, softmax 8 para edad).
 - **Split:** 80/10/10 estratificado.
-- **Salida:** `output/utkface_mobilenetv2.onnx` (opset 13), más `evaluation.json`, matriz de confusión e historial.
-- **Cópialo a** `models/utkface_mobilenetv2.onnx` y usa `MODEL_BACKEND=utkface_onnx` (o `auto`).
+- **Salida:** `output/utkface_mobilenetv2.onnx` (opset 13, entrada NCHW), más `evaluation.json`, matriz de confusión e historial.
+- **Modelo publicado:** release `v1.0.0`; descárgalo con `scripts/download_model.sh` y usa `MODEL_BACKEND=utkface_onnx` (o `auto`).
 
-**Contrato crítico:** la entrada es RGB 224×224 normalizada `x/127.5 - 1`; la salida de edad debe tener exactamente 8 clases en el orden de `AGE_BUCKETS`. Si cambias los buckets en el entrenamiento, cámbialos también en `.env`.
+**Contrato crítico:** la entrada es RGB 224×224 normalizada `x/127.5 - 1`; el ONNX usa NCHW `[N,3,224,224]` (el `Transpose` a NHWC está dentro del grafo). La salida de edad debe tener exactamente 8 clases en el orden de `AGE_BUCKETS`. Si cambias los buckets en el entrenamiento, cámbialos también en `.env`.
 
 ---
 
@@ -756,7 +770,7 @@ python3 -m py_compile app/main.py app/camera.py app/config.py \
   app/detector.py app/models_loader.py python/main.py training/train_utkface.py
 
 bash -n scripts/deploy_unoq.sh scripts/setup_board.sh scripts/run.sh \
-  scripts/download_fallback_models.sh
+  scripts/download_model.sh scripts/download_fallback_models.sh
 
 node --check static/app.js
 python3 training/train_utkface.py --self-test
@@ -773,7 +787,7 @@ Todo debe salir sin errores. `--self-test` imprime 9/9 casos correctos.
 | Página no carga | App no arrancada, IP/puerto incorrectos, firewall. | Verifica el log de Uvicorn; prueba `curl http://IP:8000/healthz`. |
 | `/api/status` → `camera_ok: false` | Cámara ausente, ocupada o índice incorrecto. | `ls -l /dev/video*`; prueba `CAMERA_INDEX=1`; cierra otros programas que usen la cámara. |
 | Stream con "CAMARA NO DISPONIBLE" | Sin frames del dispositivo. | Reconecta la Brio/hub; revisa permisos; reinicia la app. |
-| `model_loaded: false` | Faltan modelos o rutas mal. | Consulta `model_error`; ejecuta `download_fallback_models.sh` o coloca el ONNX. |
+| `model_loaded: false` | Faltan modelos o rutas mal. | Consulta `model_error`; ejecuta `download_model.sh` (ONNX) o `download_fallback_models.sh` (Caffe). |
 | Etiqueta `Género?` / `Edad?` constante | Confianza baja o umbral alto. | Mejora la luz/frontalidad; baja `CONF_THRESHOLD` a 0.5. |
 | FPS muy bajo | CPU saturada, resolución alta, varios rostros. | Sube `INFER_EVERY_N`, baja `WIDTH/HEIGHT`, baja `JPEG_QUALITY`. |
 | El puerto 8000 está ocupado | Otro servicio. | `ss -ltnp \| grep 8000`; cambia `PORT` en `.env`. |
@@ -824,7 +838,7 @@ ls -l models/fallback/ models/utkface_mobilenetv2.onnx 2>/dev/null
 
 Causas típicas:
 
-- `Modelo ONNX no encontrado: ...` → entrena y copia el `.onnx`, o usa `MODEL_BACKEND=caffe`.
+- `Modelo ONNX no encontrado: ...` → `bash scripts/download_model.sh`; si falla, usa `MODEL_BACKEND=caffe` o entrena con `training/`.
 - `Faltan modelos Caffe: ...` → `bash scripts/download_fallback_models.sh`.
 - `Error cargando ONNX: ...` → ONNX corrupto o incompatible con OpenCV; reexporta con opset 13.
 
@@ -953,6 +967,7 @@ Responsabilidades del operador:
 
 - Zhang, Z., Song, Y., & Qi, H. (2017). *Age Progression / Regression in the Wild*. ICCV Workshops.
 - Dataset distribuido en Kaggle (`jangedoo/utkface-new`). **Uso académico**; revisa la licencia del dataset antes de redistribuir imágenes o modelos derivados.
+- El modelo `utkface_mobilenetv2.onnx` es un derivado entrenado con UTKFace. Se publica para investigación y uso personal; **no** para vigilancia, perfilado biométrico ni decisiones automatizadas sobre personas.
 
 ### Modelos Caffe (Levi & Hassner)
 
@@ -1030,12 +1045,16 @@ AnalizadorRostroUNOQ/
 ├── models/
 │   ├── README.md
 │   ├── .gitkeep
+│   ├── utkface_mobilenetv2.onnx  ← descargado del release (gitignored)
 │   └── fallback/                 ← Caffe (88 MB, gitignored)
 ├── scripts/
+│   ├── download_model.sh         ← ONNX UTKFace v1.0.0
 │   ├── download_fallback_models.sh
 │   ├── setup_board.sh
 │   ├── deploy_unoq.sh
 │   └── run.sh
+├── .github/workflows/
+│   └── train-utkface.yml         ← entrenamiento en GitHub Actions
 └── docs/
     ├── datasheet.md              ← manual de usuario
     ├── developer.md              ← guía técnica

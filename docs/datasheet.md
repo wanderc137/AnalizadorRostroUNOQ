@@ -80,7 +80,7 @@ No requiere instalar nada en el navegador, no usa Internet para inferir y no gua
 
 | Backend | Archivos | Entrada | Edad |
 |---|---|---|---|
-| `utkface_onnx` | `models/utkface_mobilenetv2.onnx` | 224×224, `(x/127.5)-1`, RGB | 8 buckets configurables (`AGE_BUCKETS`) |
+| `utkface_onnx` | `models/utkface_mobilenetv2.onnx` (v1.0.0) | NCHW `[N,3,224,224]`, `(x/127.5)-1`, RGB | 8 buckets configurables (`AGE_BUCKETS`) |
 | `caffe` | `models/fallback/deploy_age.prototxt`, `age_net.caffemodel`, `deploy_gender.prototxt`, `gender_net.caffemodel` | 227×227, media BGR, sin swapRB | Buckets fijos: `0-2, 4-6, 8-12, 15-20, 25-32, 38-43, 48-53, 60-100` |
 | `none` | — | — | Solo detección, sin etiquetas |
 
@@ -94,7 +94,7 @@ No requiere instalar nada en el navegador, no usa Internet para inferir y no gua
 | Scripts de despliegue y setup (`scripts/`) | Sí |
 | Script de entrenamiento UTKFace (`training/`) | Sí |
 | Modelos Caffe fallback (`models/fallback/`, ~88 MB) | Presentes en el equipo de desarrollo, **excluidos de Git** |
-| Modelo ONNX UTKFace | **No incluido**; debe entrenarse |
+| Modelo ONNX UTKFace | **Entrenado v1.0.0**, disponible como asset del release; no se versiona en Git |
 | Cámara, hub, placa y fuente | No (hardware aparte) |
 
 ---
@@ -105,8 +105,8 @@ No requiere instalar nada en el navegador, no usa Internet para inferir y no gua
 # 1) En el host, con la placa conectada por USB
 adb devices
 
-# 2) Copiar el proyecto y preparar el entorno en la placa
-./scripts/deploy_unoq.sh --adb --setup
+# 2) Descargar el modelo y copiar/preparar el proyecto en la placa
+./scripts/deploy_unoq.sh --adb --setup --model
 
 # 3) Arrancar
 adb shell 'cd /home/arduino/ArduinoApps/AnalizadorRostroUNOQ && ./scripts/run.sh'
@@ -120,7 +120,7 @@ Si usas SSH:
 ```bash
 export UNOQ_HOST=192.168.1.50
 export UNOQ_USER=arduino
-./scripts/deploy_unoq.sh --ssh --setup
+./scripts/deploy_unoq.sh --ssh --setup --model
 ```
 
 Instalación detallada: [`../README.md`](../README.md).
@@ -226,7 +226,7 @@ Los botones se deshabilitan automáticamente según el estado (no puedes iniciar
 | `message` | Significado | Acción |
 |---|---|---|
 | `OK` | Cámara y modelo operativos. | Ninguna. |
-| `Modelo no cargado: modo solo detección` | No hay backend válido. | Instalar/entrenar modelo; revisar `model_error`. |
+| `Modelo no cargado: modo solo detección` | No hay backend válido. | `bash scripts/download_model.sh` (ONNX) o `download_fallback_models.sh`; revisar `model_error`. |
 | `Cámara no disponible` | El dispositivo no entrega frames. | Revisar conexión, `CAMERA_INDEX`, permisos. |
 | `Cámara detenida` | Se pulsó Detener o el hilo no está capturando. | Pulsar Iniciar cámara. |
 | `Pipeline detenido` | El worker fue detenido. | Iniciar cámara. |
@@ -320,7 +320,7 @@ Después de editar `.env`, **reinicia la app**.
 |---|---|
 | No carga la página | `curl http://IP:8000/healthz`; revisar que el proceso siga vivo y el puerto. |
 | Cámara offline | `ls -l /dev/video*`; revisar hub/cable; probar `CAMERA_INDEX=1`. |
-| Sin modelo | `bash scripts/download_fallback_models.sh`; revisar `model_error`. |
+| Sin modelo | `bash scripts/download_model.sh` (ONNX) o `download_fallback_models.sh`; revisar `model_error`. |
 | FPS bajo | Subir `INFER_EVERY_N`; bajar resolución; cerrar clientes. |
 | Puerto ocupado | `ss -ltnp \| grep 8000`; cambiar `PORT`. |
 | 401 | Enviar `X-Api-Token` o vaciar `API_TOKEN`. |

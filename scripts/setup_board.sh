@@ -8,12 +8,15 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 VENV_DIR="${PROJECT_ROOT}/.venv"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 WITH_MODELS=0
+WITH_ONNX=0
 
 for arg in "$@"; do
   case "${arg}" in
+    --with-model) WITH_ONNX=1 ;;
     --with-models) WITH_MODELS=1 ;;
     -h|--help)
-      echo "Uso: $0 [--with-models]"
+      echo "Uso: $0 [--with-model] [--with-models]"
+      echo "  --with-model   descarga el modelo propio UTKFace (ONNX)"
       echo "  --with-models  descarga además los modelos Caffe de fallback"
       exit 0
       ;;
@@ -50,6 +53,11 @@ echo ">> Actualizando pip"
 
 echo ">> Instalando requirements.txt"
 "${VENV_DIR}/bin/python" -m pip install -r "${PROJECT_ROOT}/requirements.txt"
+
+if [ "${WITH_ONNX}" -eq 1 ]; then
+  echo ">> Descargando modelo propio UTKFace (ONNX)"
+  bash "${PROJECT_ROOT}/scripts/download_model.sh"
+fi
 
 if [ "${WITH_MODELS}" -eq 1 ]; then
   echo ">> Descargando modelos fallback"

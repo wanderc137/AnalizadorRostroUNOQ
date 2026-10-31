@@ -4,6 +4,7 @@
 # Uso:
 #   ./scripts/deploy_unoq.sh                 # ADB si está disponible; si no, SSH
 #   ./scripts/deploy_unoq.sh --adb --setup   # copia y prepara venv en la placa
+#   ./scripts/deploy_unoq.sh --ssh --model   # SSH + modelo ONNX UTKFace
 #   ./scripts/deploy_unoq.sh --ssh --models  # SSH + descarga modelos Caffe
 #
 # SSH (opcional): exporta UNOQ_HOST=192.168.x.x [UNOQ_USER=arduino]
@@ -17,6 +18,7 @@ REMOTE_APP_DIR="${REMOTE_APP_DIR:-/home/arduino/ArduinoApps/AnalizadorRostroUNOQ
 MODE="auto"
 DO_SETUP=0
 WITH_MODELS=0
+WITH_ONNX=0
 
 ITEMS=(
   "app"
@@ -32,11 +34,12 @@ ITEMS=(
 
 usage() {
   cat <<EOF
-Uso: $0 [--adb|--ssh] [--setup] [--models]
+Uso: $0 [--adb|--ssh] [--setup] [--model] [--models]
 
   --adb       fuerza transferencia por ADB
   --ssh       fuerza transferencia por SSH/rsync
   --setup     ejecuta scripts/setup_board.sh en la placa tras copiar
+  --model     descarga el ONNX UTKFace en el host antes de copiar
   --models    al preparar, descarga también los modelos Caffe fallback
 
 Variables: REMOTE_APP_DIR, UNOQ_HOST, UNOQ_USER, UNOQ_SSH_KEY
@@ -48,6 +51,7 @@ while [ "$#" -gt 0 ]; do
     --adb) MODE="adb" ;;
     --ssh) MODE="ssh" ;;
     --setup) DO_SETUP=1 ;;
+    --model) WITH_ONNX=1 ;;
     --models) WITH_MODELS=1 ;;
     -h|--help) usage; exit 0 ;;
     *)
@@ -141,6 +145,11 @@ push_ssh() {
   fi
   return 0
 }
+
+if [ "${WITH_ONNX}" -eq 1 ]; then
+  echo ">> Descargando modelo UTKFace para incluirlo en la copia"
+  bash "${PROJECT_ROOT}/scripts/download_model.sh"
+fi
 
 case "${MODE}" in
   adb)

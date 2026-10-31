@@ -11,15 +11,29 @@ La aplicación soporta **dos backends** y elige según `MODEL_BACKEND`:
 ## 1. Modelo propio UTKFace (recomendado)
 
 - **Ruta**: `models/utkface_mobilenetv2.onnx`
-- **Formato**: ONNX opset 13, entrada `float32 [N, 224, 224, 3]`.
+- **Formato**: ONNX opset 13, entrada `float32 [N, 3, 224, 224]` (**NCHW**).
 - **Preprocesado**: BGR → RGB (`swapRB=True`), `(x - 127.5) / 127.5`, es decir
   `blobFromImage(face, 1/127.5, (224,224), (127.5,127.5,127.5), swapRB=True)`.
+  El `Transpose` NCHW → NHWC está dentro del ONNX.
 - **Salidas**:
   - `gender`: sigmoide de 1 valor → `0` = Masculino, `1` = Femenino.
   - `age`: softmax de 8 clases en el orden de `AGE_BUCKETS`:
     `0-2, 3-9, 10-19, 20-29, 30-39, 40-49, 50-59, 60+`.
-- **Cómo obtenerlo**: entrena con `training/train_utkface.py` (Colab/PC) y copia
-  el `.onnx` aquí. El ONNX **no se versiona** (ver `.gitignore`).
+- **Modelo entrenado v1.0.0** (GitHub Release, no versionado en git):
+  - URL: <https://github.com/wanderc137/AnalizadorRostroUNOQ/releases/download/v1.0.0/utkface_mobilenetv2.onnx>
+  - SHA256: `390ade0e1f237616aca4636976f3223f1b8396e4bb539c27a4b55848a30c1661`
+  - Tamaño: 10,211,778 bytes (aprox. 9.8 MB).
+  - Métricas de test (UTKFace, 2,371 imágenes): género **84.56 %**;
+    edad exacta **48.17 %**; edad ±1 bucket **83.8 %**.
+- **Cómo obtenerlo**:
+
+  ```bash
+  ./scripts/download_model.sh          # descarga y verifica el SHA256
+  ./scripts/download_model.sh --force  # vuelve a descargar
+  ```
+
+  También puedes entrenarlo con `training/train_utkface.py` y copiar el
+  `.onnx` aquí. El ONNX **no se versiona** (ver `.gitignore`).
 
 ## 2. Fallback Caffe (Levi & Hassner)
 

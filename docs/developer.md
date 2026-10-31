@@ -21,7 +21,7 @@ python/main.py           entrypoint App Lab: uvicorn.run("app.main:app", workers
 static/                  UI vanilla (sin build)
 scripts/                 descarga, setup, deploy, run
 training/                entrenamiento UTKFace (fuera de la placa)
-models/                  ONNX propio (no versionado) + fallback Caffe (gitignored)
+models/                  ONNX propio (release v1.0.0, gitignored) + fallback Caffe (gitignored)
 ```
 
 ### Flujo de importación
@@ -259,6 +259,10 @@ blob = cv2.dnn.blobFromImage(
 ```
 
 Equivale a RGB normalizado `x/127.5 - 1`.
+
+`blobFromImage` entrega un tensor **NCHW** `[1,3,224,224]`. El ONNX exportado por
+`_build_nchw_export_model` declara esa misma entrada y hace el `Transpose` a NHWC
+dentro del grafo, por lo que **no hay que transponer en la app**.
 
 **Forward:** `_forward()` ejecuta **una sola vez**; ante `cv2.error` loguea y devuelve `None` (sin reintentos). El pipeline interpreta `None` como predicción ausente.
 
@@ -647,13 +651,14 @@ init()
 ### 10.1 `scripts/setup_board.sh`
 
 ```bash
-bash scripts/setup_board.sh [--with-models]
+bash scripts/setup_board.sh [--with-model] [--with-models]
 ```
 
 - Verifica `python3` (o `PYTHON_BIN`).
 - Crea `.venv` si no existe (falla con instrucciones si falta `python3-venv`).
 - Actualiza `pip setuptools wheel` e instala `requirements.txt`.
-- Con `--with-models`, llama a `download_fallback_models.sh`.
+- Con `--with-model`, llama a `download_model.sh` (ONNX UTKFace v1.0.0).
+- Con `--with-models`, llama a `download_fallback_models.sh` (Caffe).
 - Copia `.env.example` → `.env` si no existe.
 - Idempotente.
 
@@ -671,7 +676,7 @@ bash scripts/setup_board.sh [--with-models]
 ### 10.3 `scripts/deploy_unoq.sh`
 
 ```bash
-./scripts/deploy_unoq.sh [--adb|--ssh] [--setup] [--models]
+./scripts/deploy_unoq.sh [--adb|--ssh] [--setup] [--model] [--models]
 ```
 
 Variables: `REMOTE_APP_DIR` (default `/home/arduino/ArduinoApps/AnalizadorRostroUNOQ`), `UNOQ_HOST`, `UNOQ_USER` (default `arduino`), `UNOQ_SSH_KEY`.
@@ -679,12 +684,26 @@ Variables: `REMOTE_APP_DIR` (default `/home/arduino/ArduinoApps/AnalizadorRostro
 - `--adb`: exige `adb devices` con al menos un `device`; hace `mkdir -p` y `adb push` de `ITEMS`.
 - `--ssh`: exige `UNOQ_HOST`; `rsync -az` con exclusiones (`.venv`, `venv`, `__pycache__`, `.git`, `snapshots`, `dataset`, `.env`, `*.pyc`) o `scp` por ítem si no hay rsync.
 - `--setup`: ejecuta `setup_board.sh` en remoto.
-- `--models`: añade `--with-models` al setup remoto.
+- `--model`: ejecuta `download_model.sh` en el host antes de copiar; el ONNX viaja
+  dentro de `models/` y queda disponible en la placa.
+- `--models`: añade `--with-models` al setup remoto (Caffe).
 - `auto`: intenta ADB y cae a SSH.
 
 > `.env` **nunca** se copia: evita filtrar tokens. El setup remoto crea uno desde `.env.example`.
 
-### 10.4 `scripts/download_fallback_models.sh`
+### 10.4 `scripts/download_model.sh`
+
+```bash
+bash scripts/download_model.sh [--force]
+```
+
+- Descarga `utkface_mobilenetv2.onnx` desde el release `v1.0.0`.
+- Variables `MODEL_URL` y `MODEL_SHA256` para apuntar a otro release/espejo.
+- Verifica tamaño mínimo (9,000,000 bytes) y SHA256 antes de instalar.
+- Usa `.part` y solo renombra si la verificación pasa; `--force` redescarga.
+- Si el archivo ya existe y el hash coincide, no descarga.
+
+### 10.5 `scripts/download_fallback_models.sh`
 
 ```bash
 bash scripts/download_fallback_models.sh [destino]
@@ -713,12 +732,15 @@ bash scripts/download_fallback_models.sh [destino]
 | `collect_samples(dir, validate)` | Recorre imágenes, parsea y opcionalmente descarta corruptas (OpenCV en modo reducido). |
 | `maybe_download(dir, slug)` | `kaggle datasets download ... --unzip`. |
 | `split_dataset(...)` | Estratificado 80/10/10 con `scikit-learn`. |
-| `build_datasets(...)` | `tf.data` con augmentación solo en train. |
+| `bucketize_ages(ages, buckets)` | Mapea edad cruda 0–120 → índice de bucket (0–7). Única fuente de verdad. |
+| `build_datasets(...)` | `tf.data` con augmentación solo en train; aplica `bucketize_ages` antes del one-hot. |
 | `build_model(num_buckets, lr)` | MobileNetV2 congelada + 2 cabezas. |
 | `compile_model(model, lr)` | Adam, losses y `loss_weights={"gender":1.0,"age":2.0}`. |
 | `unfreeze_top(base, n)` | Fine-tuning de las últimas `n` capas. |
 | `ensure_onnx_output_names(path)` | Renombra/crea salidas `gender` y `age`. |
-| `export_onnx(model, path)` | `tf2onnx` opset 13; reintenta con modelo congelado. |
+| `_build_nchw_export_model(model)` | Envuelve el modelo Keras NHWC con entrada NCHW `(None,3,224,224)` y `Transpose` interno. |
+| `validate_onnx_model(path)` | Valida entrada `[N,3,224,224]` y salidas `gender`/`age`; si hay `onnxruntime`, ejecuta una inferencia dummy. |
+| `export_onnx(model, path)` | Exporta el wrapper NCHW con `tf2onnx` opset 13; valida el resultado. |
 | `export_tflite(model, path)` | Exportación opcional. |
 | `evaluate(...)` | Accuracy, classification report, matriz de confusión, `evaluation.json`. |
 | `save_history(...)` | `history.json` + `training_history.png`. |
@@ -726,9 +748,12 @@ bash scripts/download_fallback_models.sh [destino]
 
 ### 11.2 Contrato de exportación
 
-- Entrada: `tf.TensorSpec((None, 224, 224, 3), tf.float32, name="input")` (NHWC).
+- Entrada: `tf.TensorSpec((None, 3, 224, 224), tf.float32, name="input")` (**NCHW**).
+  El modelo Keras interno sigue siendo NHWC; `_build_nchw_export_model` inserta un
+  `tf.transpose(input, [0, 2, 3, 1])` antes de la red.
 - Salidas: `gender` (1 valor) y `age` (8 valores).
-- Opset 13.
+- Opset 13. `validate_onnx_model` comprueba el contrato y, si `onnxruntime` está
+  instalado, ejecuta una inferencia dummy comprobando formas y valores finitos.
 - `ensure_onnx_output_names` identifica por forma (`last == 1` → gender; `last == 8` → age) y añade nodos `Identity` si hace falta.
 
 ### 11.3 CLI
@@ -756,6 +781,17 @@ output/
 ```
 
 > Si usas Keras 3 y falla `tf2onnx`, exporta con `TF_USE_LEGACY_KERAS=1` (documentado en `training/README.md`).
+
+### 11.5 Modelo publicado v1.0.0
+
+- Release: `https://github.com/wanderc137/AnalizadorRostroUNOQ/releases/tag/v1.0.0`
+- Asset: `utkface_mobilenetv2.onnx` (10,211,778 bytes).
+- SHA256: `390ade0e1f237616aca4636976f3223f1b8396e4bb539c27a4b55848a30c1661`.
+- Métricas de test (2,371 imágenes): género 84.56 %, edad exacta 48.17 %,
+  edad ±1 bucket 83.8 %.
+- Entrenamiento: GitHub Actions, 10 épocas, MobileNetV2 congelada, lr 3e-4.
+- El `.onnx` no se versiona; se obtiene con `scripts/download_model.sh` o desde
+  el release.
 
 ---
 
