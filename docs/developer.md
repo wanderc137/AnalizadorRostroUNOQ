@@ -457,7 +457,7 @@ El orden importa: al arrancar, primero cámara y luego pipeline; al parar, prime
 | `api_status()` | `pipeline.status()`. |
 | `api_config()` | `cfg.public_config()` (sin secretos). |
 | `healthz()` | `{"ok": True}`; útil para probes. |
-| `api_camera_start()` | Token → `control_lock` → si ya está activa responde idempotente → stop pipeline/cámara → start cámara → espera ≤1.5 s a `is_ok` → 503 si falla → `pipeline.start()`. |
+| `api_camera_start()` | Token → `control_lock` → si ya está activa responde idempotente → stop pipeline/cámara → start cámara → espera hasta 8 s a `is_ok` → 503 si falla → `pipeline.start()`. |
 | `api_camera_stop()` | Token → `control_lock` → stop pipeline → stop cámara. |
 | `api_snapshot()` | Token → rate-limit atómico (`snapshot_lock`) → `ensure_snap_folder()` (400/503) → `latest_frame()` (503) → PIL RGB quality 92 → fallback a `latest_jpeg()` o `imencode` → `{ok, path}`. |
 | `video_feed()` | `StreamingResponse` con generador que registra cliente, hace yield solo cuando cambia el JPEG y se desregistra en `finally`. |
@@ -620,7 +620,7 @@ frontend pueda elegir el anuncio contextual.
 ### 8.3 `POST /api/camera/start`
 
 - 200: `{ok, camera: {...}, pipeline_running: true}`.
-- 503: no se pudo abrir en 1.5 s (`detail` con el error de cámara).
+- 503: no se pudo abrir en 8 s (`detail` con el error de cámara).
 - 401: token requerido/incorrecto.
 
 ### 8.4 `POST /api/camera/stop`
@@ -1119,7 +1119,8 @@ python3 training/train_utkface.py --self-test
 | [`../README.md`](../README.md) | Instalación, operación, API, problemas. |
 | [`datasheet.md`](datasheet.md) | Manual de usuario. |
 | [`BITACORA.md`](BITACORA.md) | Decisiones, descartes y lecciones. |
-| [`../documento interno de planificación`](../documento interno de planificación) | Especificación y criterios de aceptación. |
-| [`../auditoría interna`](../auditoría interna) | Auditoría estática (9 incidencias resueltas). |
+| Planificación interna | Documento de trabajo no publicado en el repositorio. |
+| Auditoría interna | Informe de revisión estática no publicado; las 9 incidencias se resolvieron y verificaron. |
+| [`REFERENCES.md`](REFERENCES.md) | Enlaces oficiales y comunitarios. |
 | [`../models/README.md`](../models/README.md) | Contrato de modelos. |
 | [`../training/README.md`](../training/README.md) | Entrenamiento UTKFace. |

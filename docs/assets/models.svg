@@ -143,12 +143,12 @@
   <line class="arrowMuted" x1="962" y1="520" x2="1002" y2="520" marker-end="url(#arrowMuted)"/>
 
   <!-- Metrics -->
-  <rect class="panel" x="280" y="626" width="682" height="76" rx="12"/>
-  <text class="h2" x="300" y="650">TEST UTKFACE · 2.371 IMÁGENES DE HOLDOUT</text>
-  <text class="t" x="300" y="674">Género 84.56 % · edad exacta 48.17 % · edad ±1 bucket 83.8 %</text>
-  <text class="m" x="300" y="692">Métricas del entrenamiento v1.0.0; no son un benchmark ni garantizan precisión en cámara real.</text>
+  <rect class="panel" x="280" y="600" width="682" height="76" rx="12"/>
+  <text class="h2" x="300" y="624">TEST UTKFACE · 2.371 IMÁGENES DE HOLDOUT</text>
+  <text class="t" x="300" y="648">Género 84.56 % · edad exacta 48.17 % · edad ±1 bucket 83.8 %</text>
+  <text class="m" x="300" y="666">Métricas del entrenamiento v1.0.0; no son un benchmark ni garantizan precisión en cámara real.</text>
 
-  <text class="m" x="40" y="682">La confianza mostrada es el promedio de las dos cabezas;</text>
-  <text class="m" x="40" y="700">no es una probabilidad calibrada.</text>
-  <text class="m" x="40" y="726">Cambiar buckets u orden invalida las etiquetas.</text>
+  <text class="m" x="40" y="700">La confianza mostrada es el promedio de las dos cabezas;</text>
+  <text class="m" x="40" y="718">no es una probabilidad calibrada.</text>
+  <text class="m" x="40" y="736">Cambiar buckets u orden invalida las etiquetas.</text>
 </svg>

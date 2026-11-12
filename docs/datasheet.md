@@ -52,15 +52,17 @@ No requiere instalar nada en el navegador, no usa Internet para inferir y no gua
 
 | Componente | Versión / requisito |
 |---|---|
-| Python | 3.9+ |
+| Python | 3.10+ (validado con 3.13 en ARM64) |
 | FastAPI | `>=0.115.0,<0.116` |
 | Uvicorn | `>=0.30.0,<0.31` |
-| OpenCV | `opencv-python-headless>=4.9.0,<4.11` |
-| NumPy | `>=1.26.0,<2.0` |
-| Pillow | `>=10.0.0,<11.0` |
+| OpenCV | `opencv-python-headless>=4.12.0,<5` |
+| NumPy | `>=2.2.0,<3` |
+| Pillow | `>=11.0.0,<13` |
 | python-dotenv | `>=1.0.0,<2.0` |
 | python-multipart | `>=0.0.9,<0.1` |
 | Navegador | Chrome, Firefox, Edge o Safari actualizados |
+
+Las versiones exactas de runtime están fijadas en [`../requirements.txt`](../requirements.txt); el procedimiento de instalación con entorno virtual está en la sección 14.
 
 ### 2.3 Servicio
 
@@ -94,7 +96,7 @@ No requiere instalar nada en el navegador, no usa Internet para inferir y no gua
 | Scripts de despliegue y setup (`scripts/`) | Sí |
 | Script de entrenamiento UTKFace (`training/`) | Sí |
 | Modelos Caffe fallback (`models/fallback/`, ~88 MB) | Presentes en el equipo de desarrollo, **excluidos de Git** |
-| Modelo ONNX UTKFace | **Entrenado v1.0.0**, disponible como asset del release privado; en la placa ya está instalado; no se versiona en Git |
+| Modelo ONNX UTKFace | **Entrenado v1.0.0**, disponible como asset del release v1.0.0; en la placa de referencia ya está instalado; no se versiona en Git |
 | Cámara, hub, placa y fuente | No (hardware aparte) |
 
 ---
@@ -167,7 +169,7 @@ Instalación detallada: [`../README.md`](../README.md).
 
 | Control | Acción | Requisitos |
 |---|---|---|
-| **Iniciar cámara** | Reinicia cámara y pipeline; espera hasta 1.5 s a que haya frames. | Token si `API_TOKEN` está definido. |
+| **Iniciar cámara** | Reinicia cámara y pipeline; espera hasta 8 s a que haya frames. | Token si `API_TOKEN` está definido. |
 | **Detener** | Detiene el worker y libera el dispositivo de vídeo. | Token si aplica. |
 | **Snapshot** | Guarda un JPG en `SNAP_FOLDER`. | `SNAP_FOLDER` configurado + token si aplica. |
 | **Token API** | Guarda el token en la sesión del navegador. | Solo visible si `auth_enabled`. |
@@ -337,11 +339,11 @@ Después de editar `.env`, **reinicia la app**.
 | Escenario | Expectativa de diseño |
 |---|---|
 | 0 clientes MJPEG | CPU mínima: solo lectura de cámara cada 250 ms, sin inferencia ni JPEG. |
-| 1 cliente, 1 rostro, 640×480 | Objetivo 10–15 FPS en QRB2210 (no medido). |
+| 1 cliente, 1 rostro, 640×480 | ~15 FPS de UI medidos con IP Webcam 1080p reducida a 640×360; no es un benchmark formal. |
 | Varios clientes | El coste no se multiplica: todos leen el mismo JPEG publicado. |
 | Varios rostros | El coste de inferencia crece por rostro. |
 
-> **No se ha medido en hardware.** Ajusta `INFER_EVERY_N`, resolución y `JPEG_QUALITY` según lo que reporte `/api/status`.
+> **Medición parcial.** El escenario IP Webcam con un cliente se observó en la placa de referencia (~15 FPS de UI, inferencia ONNX cada 5 frames). No se midieron Brio USB, Caffe, varios clientes, latencia de inferencia ni temperatura sostenida. Ajusta `INFER_EVERY_N`, resolución y `JPEG_QUALITY` según lo que reporte `/api/status`.
 
 ---
 
@@ -404,7 +406,7 @@ pip install -r requirements-train.txt
 ### 14.3 Notas
 
 - No instales `opencv-python` completo en la placa: requiere librerías gráficas.
-- Mantén `numpy<2` mientras uses OpenCV < 4.11.
+- Usa las versiones de `requirements.txt` (OpenCV 4.12+ y NumPy 2.2+). Las combinaciones antiguas OpenCV 4.9/4.10 con NumPy 2 no son compatibles.
 - Si `python3 -m venv` falla, falta `python3-venv` (requiere autorización para instalar).
 
 ---

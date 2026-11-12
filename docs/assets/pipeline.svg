@@ -143,7 +143,7 @@
   <rect class="warnPanel" x="40" y="540" width="520" height="126" rx="12"/>
   <text class="h2" x="58" y="566">RAMA IDLE · SIN CLIENTES MJPEG</text>
   <text class="t" x="58" y="590">El worker lee la cámara cada 250 ms y conserva el frame para snapshots.</text>
-  <text class="m" x="58" y="612">No ejecuta Haar, ni la red, ni cv2.imencode. `add_client()` lo despierta.</text>
+  <text class="m" x="58" y="612">No ejecuta Haar, ni la red, ni cv2.imencode. add_client() lo despierta.</text>
   <text class="m" x="58" y="634">CPU en reposo casi nula; el stream se reanuda al abrir la UI.</text>
 
   <rect class="panel" x="590" y="540" width="300" height="126" rx="12"/>
