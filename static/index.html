@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0d12">
+  <title>Analizador de Rostros · Arduino UNO Q</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <div class="brand-text">
+        <h1>Analizador de Rostros</h1>
+        <p>Arduino UNO Q · MPU Linux · inferencia local</p>
+      </div>
+    </div>
+    <div class="badges" aria-live="polite">
+      <span id="badge-camera" class="badge badge--idle">Cámara…</span>
+      <span id="badge-model" class="badge badge--idle">Modelo…</span>
+      <span id="badge-fps" class="badge badge--idle">FPS 0.0</span>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- Gran formato publicitario: se elige según género y rango de edad. -->
+    <section class="card showcase" id="showcase" aria-label="Publicidad contextual">
+      <img id="ad-image" class="ad-image" src="/static/ads/travel-default.svg"
+           alt="Publicidad de viajes: el destino te está esperando">
+      <div class="ad-shade" aria-hidden="true"></div>
+      <div class="ad-grid" aria-hidden="true"></div>
+      <div class="ad-scan" aria-hidden="true"></div>
+
+      <div class="ad-topline">
+        <span class="ad-label">PUBLICIDAD</span>
+        <span class="ad-live"><i aria-hidden="true"></i> IA local</span>
+      </div>
+
+      <div class="ad-content">
+        <span id="ad-badge" class="ad-badge">VIAJES</span>
+        <p id="ad-kicker" class="ad-kicker">TEMPORADA 2026</p>
+        <h2 id="ad-title">El destino te está esperando.</h2>
+        <p id="ad-subtitle">Playa, montaña o ciudad: elegí tu próxima escapada con tarifas especiales y cuotas sin interés.</p>
+        <div class="ad-actions">
+          <span id="ad-price" class="ad-price">Desde US$ 399</span>
+          <button id="ad-cta" class="ad-cta" type="button">Ver destinos <span aria-hidden="true">→</span></button>
+        </div>
+      </div>
+
+      <div class="ad-footer">
+        <span id="ad-reason">Sin rostro detectado · modo viajes.</span>
+        <span class="ad-privacy">Sin nube · sin guardar imágenes</span>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <section class="card panel">
+        <div class="panel-head">
+          <div>
+            <h2>Estado del sistema</h2>
+            <p class="panel-sub">UNO Q · MPU Linux</p>
+          </div>
+          <span class="pulse-dot" aria-hidden="true"></span>
+        </div>
+
+        <dl class="status-grid">
+          <div><dt>Cámara</dt><dd id="status-camera">—</dd></div>
+          <div><dt>Backend</dt><dd id="status-backend">—</dd></div>
+          <div><dt>Modelo</dt><dd id="status-model">—</dd></div>
+          <div><dt>Resolución</dt><dd id="status-resolution">—</dd></div>
+          <div><dt>Inferencia</dt><dd id="status-infer">—</dd></div>
+          <div><dt>FPS</dt><dd id="status-fps">—</dd></div>
+        </dl>
+
+        <p id="status-message" class="message">Iniciando…</p>
+
+        <div class="legend">
+          <h3>Cómo funciona</h3>
+          <p>
+            Un worker captura la cámara, detecta rostros con Haar y clasifica
+            género y rango de edad cada <strong id="legend-every">5</strong> frames.
+            La publicidad cambia con la persona detectada; todo ocurre en la UNO Q.
+          </p>
+        </div>
+
+        <div class="api-note">
+          <span>API</span>
+          <code>GET /api/status</code>
+          <code>GET /api/config</code>
+        </div>
+      </section>
+
+      <!-- Video deliberadamente pequeño, debajo del estado. -->
+      <section class="card camera-card">
+        <div class="camera-head">
+          <div>
+            <h2>Vista en vivo</h2>
+            <p class="panel-sub">Seguimiento reducido</p>
+          </div>
+          <span id="camera-live" class="camera-live"><i aria-hidden="true"></i><span id="camera-state">conectando</span></span>
+        </div>
+
+        <div class="video-wrap">
+          <img id="stream" alt="Vídeo en vivo de la cámara con rostros detectados">
+          <div id="stream-overlay" class="stream-overlay">Conectando con la cámara…</div>
+          <div class="hud">
+            <div class="hud-stat">
+              <span id="faces-count">0</span>
+              <small>rostros</small>
+            </div>
+            <div class="hud-stat hud-stat--muted">
+              <span id="hud-fps">0.0</span>
+              <small>FPS</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button id="btn-start" class="btn btn--primary" type="button">Iniciar cámara</button>
+          <button id="btn-stop" class="btn btn--ghost" type="button">Detener</button>
+          <button id="btn-snapshot" class="btn btn--ghost" type="button" hidden>Snapshot</button>
+        </div>
+
+        <label id="auth-row" class="auth-row" hidden
+               title="Requerido para iniciar/detener la cámara y guardar snapshots cuando API_TOKEN está definido">
+          <span>Token API</span>
+          <input id="api-token" type="password" autocomplete="off"
+                 placeholder="Header X-Api-Token" aria-label="Token de API">
+        </label>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <p class="privacy">
+      Esta aplicación procesa rostros localmente en la Arduino UNO Q.
+      No se guardan imágenes a menos que actives el snapshot.
+    </p>
+    <p class="meta">AnalizadorRostroUNOQ v1.0 · STM32U585 no interviene en la inferencia</p>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

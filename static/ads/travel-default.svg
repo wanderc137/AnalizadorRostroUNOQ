@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Atardecer en una playa con palmeras, mar y un avión">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#06101f"/>
+      <stop offset="0.38" stop-color="#0d3554"/>
+      <stop offset="0.62" stop-color="#a8534f"/>
+      <stop offset="0.79" stop-color="#f29a62"/>
+      <stop offset="0.92" stop-color="#ffd08a"/>
+      <stop offset="1" stop-color="#ffe9b8"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#fff4c9" stop-opacity="1"/>
+      <stop offset="0.32" stop-color="#ffd27a" stop-opacity="0.62"/>
+      <stop offset="0.66" stop-color="#ff9d5c" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ff8a4c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1e5a70"/>
+      <stop offset="0.28" stop-color="#123f58"/>
+      <stop offset="0.7" stop-color="#0a2c42"/>
+      <stop offset="1" stop-color="#071d2d"/>
+    </linearGradient>
+    <linearGradient id="beach" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8bd85"/>
+      <stop offset="0.35" stop-color="#c98f5b"/>
+      <stop offset="1" stop-color="#6e432b"/>
+    </linearGradient>
+    <linearGradient id="reflection" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd48a" stop-opacity="0.75"/>
+      <stop offset="0.55" stop-color="#ff9c5a" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#ff7a4a" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <filter id="cloudBlur" x="-30%" y="-80%" width="160%" height="260%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#sky)"/>
+
+  <!-- Sol y resplandor -->
+  <circle cx="1210" cy="470" r="230" fill="url(#sunGlow)" opacity="0.9"/>
+  <circle cx="1210" cy="470" r="86" fill="#fff0b8" opacity="0.96"/>
+  <circle cx="1210" cy="470" r="118" fill="#ffd27a" opacity="0.18" filter="url(#softGlow)"/>
+
+  <!-- Nubes altas -->
+  <g fill="#f7c9a1" opacity="0.16" filter="url(#cloudBlur)">
+    <ellipse cx="300" cy="220" rx="190" ry="26"/>
+    <ellipse cx="470" cy="260" rx="130" ry="18"/>
+    <ellipse cx="980" cy="170" rx="160" ry="20"/>
+    <ellipse cx="1320" cy="290" rx="220" ry="24"/>
+    <ellipse cx="760" cy="330" rx="120" ry="14"/>
+  </g>
+
+  <!-- Aves -->
+  <g stroke="#101b27" stroke-width="4" fill="none" opacity="0.62" stroke-linecap="round">
+    <path d="M920 365 q16 -12 32 0 q16 -12 32 0"/>
+    <path d="M1010 325 q12 -9 24 0 q12 -9 24 0"/>
+    <path d="M1090 385 q10 -7 20 0 q10 -7 20 0"/>
+  </g>
+
+  <!-- Cordillera lejana -->
+  <path d="M0 640 L150 520 L280 610 L430 480 L590 616 L760 505 L930 630 L1100 535 L1270 618 L1435 500 L1600 610 L1600 720 L0 720 Z"
+        fill="#143b50" opacity="0.86"/>
+  <path d="M0 680 L190 585 L360 665 L520 555 L700 675 L880 585 L1070 680 L1260 600 L1440 675 L1600 585 L1600 760 L0 760 Z"
+        fill="#0a283b" opacity="0.92"/>
+
+  <!-- Mar -->
+  <rect x="0" y="640" width="1600" height="360" fill="url(#sea)"/>
+  <path d="M1140 640 Q1200 640 1260 640 L1240 760 Q1215 805 1195 905 L1165 905 Q1175 795 1150 760 Z"
+        fill="#ffcf86" opacity="0.12"/>
+  <g fill="#ffd9a0" opacity="0.42">
+    <rect x="1138" y="654" width="132" height="3" rx="1.5"/>
+    <rect x="1150" y="674" width="108" height="3" rx="1.5"/>
+    <rect x="1162" y="696" width="88" height="4" rx="2"/>
+    <rect x="1170" y="720" width="72" height="3" rx="1.5"/>
+    <rect x="1178" y="746" width="58" height="4" rx="2"/>
+    <rect x="1186" y="776" width="42" height="3" rx="1.5"/>
+    <rect x="1192" y="808" width="30" height="3" rx="1.5"/>
+  </g>
+  <g stroke="#8fc7d8" stroke-linecap="round" opacity="0.18">
+    <path d="M180 700 q35 -10 70 0" stroke-width="3"/>
+    <path d="M350 745 q45 -12 90 0" stroke-width="2"/>
+    <path d="M620 690 q40 -10 80 0" stroke-width="2"/>
+    <path d="M760 780 q55 -12 110 0" stroke-width="2"/>
+    <path d="M420 830 q60 -12 120 0" stroke-width="2"/>
+  </g>
+
+  <!-- Velero -->
+  <g transform="translate(640 645)" opacity="0.9">
+    <path d="M0 46 L92 46 L76 62 L16 62 Z" fill="#061622"/>
+    <path d="M45 44 L45 -30 L4 40 Z" fill="#f6e4c8" opacity="0.9"/>
+    <path d="M49 42 L49 -18 L84 38 Z" fill="#efc38f" opacity="0.8"/>
+    <path d="M45 44 L45 62" stroke="#061622" stroke-width="3"/>
+  </g>
+
+  <!-- Avión y estela -->
+  <path d="M690 280 C820 252 960 238 1120 238" fill="none" stroke="#ffe4c4" stroke-width="3" opacity="0.18" stroke-linecap="round"/>
+  <g transform="translate(1120 238) rotate(-7)" fill="#081722" opacity="0.9">
+    <path d="M0 0 L86 9 L124 2 L92 21 L48 25 L22 16 L-8 21 L8 9 Z"/>
+    <path d="M40 10 L20 -26 L34 -26 L64 8 Z"/>
+    <path d="M40 15 L20 50 L34 50 L64 17 Z"/>
+    <path d="M74 9 L88 -6 L96 -6 L86 11 Z"/>
+  </g>
+
+  <!-- Playa -->
+  <path d="M0 860 C250 805 500 835 760 875 C1020 915 1300 905 1600 850 L1600 1000 L0 1000 Z" fill="url(#beach)"/>
+  <path d="M0 870 C250 815 500 845 760 885 C1020 925 1300 915 1600 860" fill="none" stroke="#fff1d2" stroke-width="12" opacity="0.28"/>
+  <path d="M0 900 C270 850 520 880 780 918 C1040 956 1310 942 1600 892" fill="none" stroke="#fff7e3" stroke-width="4" opacity="0.22"/>
+
+  <!-- Palmeras -->
+  <g fill="#06131d" opacity="0.96">
+    <path d="M1370 960 C1384 832 1400 700 1448 566 L1472 574 C1432 710 1422 838 1418 960 Z"/>
+    <path d="M1458 574 C1388 524 1318 536 1268 584 C1330 558 1402 566 1458 602 Z"/>
+    <path d="M1458 570 C1424 500 1352 476 1296 504 C1360 504 1416 532 1458 594 Z"/>
+    <path d="M1464 566 C1470 490 1530 438 1594 446 C1528 468 1490 510 1480 580 Z"/>
+    <path d="M1464 574 C1520 522 1592 520 1636 558 C1568 546 1510 566 1470 604 Z"/>
+    <path d="M1472 580 C1498 640 1560 676 1624 664 C1560 648 1518 618 1482 570 Z"/>
+    <path d="M1448 566 C1428 646 1372 690 1310 686 C1368 664 1406 626 1438 560 Z"/>
+  </g>
+  <g fill="#06131d" opacity="0.82">
+    <path d="M1510 960 C1518 884 1530 810 1562 746 L1578 752 C1554 816 1548 886 1546 960 Z"/>
+    <path d="M1562 748 C1516 720 1474 728 1444 758 C1484 740 1526 746 1562 768 Z"/>
+    <path d="M1564 744 C1542 700 1498 684 1462 702 C1504 702 1538 720 1562 760 Z"/>
+    <path d="M1568 742 C1576 692 1616 662 1654 668 C1612 682 1588 710 1580 754 Z"/>
+    <path d="M1568 748 C1604 714 1650 714 1678 738 C1634 730 1596 744 1572 770 Z"/>
+  </g>
+
+  <!-- Destellos de arena -->
+  <g fill="#ffe8bd" opacity="0.4">
+    <circle cx="210" cy="930" r="2.5"/>
+    <circle cx="330" cy="905" r="2"/>
+    <circle cx="570" cy="945" r="2.5"/>
+    <circle cx="870" cy="960" r="2"/>
+    <circle cx="1080" cy="925" r="2.5"/>
+    <circle cx="1260" cy="955" r="2"/>
+  </g>
+
+  <!-- Viñeta suave para integrar con la UI -->
+  <rect width="1600" height="1000" fill="none" stroke="#000" stroke-width="80" opacity="0.18"/>
+</svg>

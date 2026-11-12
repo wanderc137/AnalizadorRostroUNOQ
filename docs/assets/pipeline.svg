@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
+  <title id="title">Pipeline de visión de AnalizadorRostroUNOQ</title>
+  <desc id="desc">Flujo de un frame: captura, programación cada N frames, detección Haar, ROI con margen, modelo ONNX o Caffe, overlay, JPEG, publicación bajo lock y clientes MJPEG. Incluye la rama idle sin clientes.</desc>
+  <defs>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#16202c" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="panelGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#141e2a"/>
+      <stop offset="1" stop-color="#0f1721"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4fd1c5"/>
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f6ad55"/>
+    </marker>
+    <marker id="arrowMuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b98a9"/>
+    </marker>
+    <style>
+      .bg { fill: #0b1017; }
+      .panel { fill: url(#panelGrad); stroke: #263244; stroke-width: 1.2; }
+      .panel2 { fill: #0e1620; stroke: #223042; stroke-width: 1; }
+      .accentPanel { fill: #10222a; stroke: #2f5a5c; stroke-width: 1.4; }
+      .warnPanel { fill: #241a10; stroke: #5c4526; stroke-width: 1.2; }
+      .title { fill: #e6edf3; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 30px; font-weight: 700; }
+      .subtitle { fill: #8b98a9; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 14px; }
+      .step { fill: #4fd1c5; font-family: 'SFMono-Regular', Consolas, monospace; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; }
+      .h { fill: #e6edf3; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 15px; font-weight: 650; }
+      .h2 { fill: #4fd1c5; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.7px; }
+      .t { fill: #c7d2df; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 12px; }
+      .m { fill: #8b98a9; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 11px; }
+      .mono { fill: #a9e8df; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 11px; }
+      .amber { fill: #f6ad55; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 11.5px; font-weight: 600; }
+      .arrow { stroke: #4fd1c5; stroke-width: 2; fill: none; }
+      .arrowAmber { stroke: #f6ad55; stroke-width: 2; fill: none; }
+      .arrowMuted { stroke: #8b98a9; stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
+      .dot { fill: #4fd1c5; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="780"/>
+  <rect x="0" y="0" width="1200" height="780" fill="url(#grid)" opacity="0.55"/>
+
+  <text class="title" x="40" y="52">Pipeline de visión</text>
+  <text class="subtitle" x="40" y="76">Un único productor recorre el frame una vez; los clientes solo leen el último JPEG publicado</text>
+  <circle cx="1148" cy="48" r="5" class="dot"/>
+  <text class="m" x="1138" y="53" text-anchor="end">~15 fps UI · medición parcial</text>
+
+  <!-- Row 1 -->
+  <rect class="accentPanel" x="40" y="112" width="198" height="126" rx="12"/>
+  <text class="step" x="56" y="136">01 · CAPTURA</text>
+  <text class="h" x="56" y="160">Camera thread</text>
+  <text class="t" x="56" y="182">V4L2 o FFmpeg</text>
+  <text class="m" x="56" y="202">Guarda el último frame</text>
+  <text class="m" x="56" y="220">Reconexión automática</text>
+
+  <rect class="panel" x="270" y="112" width="190" height="126" rx="12"/>
+  <text class="step" x="286" y="136">02 · FRAME</text>
+  <text class="h" x="286" y="160">Frame BGR</text>
+  <text class="t" x="286" y="182">640×480 por defecto</text>
+  <text class="m" x="286" y="202">Copia inmutable para</text>
+  <text class="m" x="286" y="220">detección y overlay</text>
+
+  <rect class="panel" x="492" y="112" width="204" height="126" rx="12"/>
+  <text class="step" x="508" y="136">03 · SCHEDULER</text>
+  <text class="h" x="508" y="160">¿Toca inferir?</text>
+  <text class="t" x="508" y="182">frame_index % N == 0</text>
+  <text class="m" x="508" y="202">o todavía no hay caras</text>
+  <text class="mono" x="508" y="220">INFER_EVERY_N=5</text>
+
+  <rect class="panel" x="728" y="112" width="190" height="126" rx="12"/>
+  <text class="step" x="744" y="136">04 · DETECCIÓN</text>
+  <text class="h" x="744" y="160">Haar cascade</text>
+  <text class="t" x="744" y="182">gris + equalizeHist</text>
+  <text class="mono" x="744" y="202">scale 1.1 · neigh 5</text>
+  <text class="mono" x="744" y="220">minSize 60×60</text>
+
+  <rect class="panel" x="950" y="112" width="210" height="126" rx="12"/>
+  <text class="step" x="966" y="136">05 · ROI</text>
+  <text class="h" x="966" y="160">Recorte + 6 %</text>
+  <text class="t" x="966" y="182">Incluye mentón y frente</text>
+  <text class="m" x="966" y="202">Se recorta del frame</text>
+  <text class="m" x="966" y="220">original, no del gris</text>
+
+  <line class="arrow" x1="238" y1="175" x2="268" y2="175" marker-end="url(#arrow)"/>
+  <line class="arrow" x1="460" y1="175" x2="490" y2="175" marker-end="url(#arrow)"/>
+  <line class="arrow" x1="696" y1="175" x2="726" y2="175" marker-end="url(#arrow)"/>
+  <line class="arrow" x1="918" y1="175" x2="948" y2="175" marker-end="url(#arrow)"/>
+
+  <!-- vertical -->
+  <line class="arrow" x1="1055" y1="238" x2="1055" y2="326" marker-end="url(#arrow)"/>
+
+  <!-- Row 2 (right to left) -->
+  <rect class="accentPanel" x="950" y="330" width="210" height="136" rx="12"/>
+  <text class="step" x="966" y="354">06 · MODELO</text>
+  <text class="h" x="966" y="378">ONNX o Caffe</text>
+  <text class="t" x="966" y="400">224×224 / 227×227</text>
+  <text class="m" x="966" y="420">Género + edad</text>
+  <text class="m" x="966" y="438">Confianza por cabeza</text>
+  <text class="m" x="966" y="456">Si falla: sin predicción</text>
+
+  <rect class="panel" x="728" y="330" width="190" height="136" rx="12"/>
+  <text class="step" x="744" y="354">07 · OVERLAY</text>
+  <text class="h" x="744" y="378">Dibujo</text>
+  <text class="t" x="744" y="400">Caja + etiqueta</text>
+  <text class="m" x="744" y="420">Verde/teal con predicción</text>
+  <text class="m" x="744" y="438">Ámbar sin predicción</text>
+  <text class="m" x="744" y="456">HUD: rostros y FPS</text>
+
+  <rect class="panel" x="492" y="330" width="204" height="136" rx="12"/>
+  <text class="step" x="508" y="354">08 · JPEG</text>
+  <text class="h" x="508" y="378">Codificación</text>
+  <text class="t" x="508" y="400">cv2.imencode(.jpg)</text>
+  <text class="mono" x="508" y="420">JPEG_QUALITY=80</text>
+  <text class="m" x="508" y="440">Coste real por frame</text>
+  <text class="m" x="508" y="458">Solo si hay clientes</text>
+
+  <rect class="panel" x="270" y="330" width="190" height="136" rx="12"/>
+  <text class="step" x="286" y="354">09 · PUBLICAR</text>
+  <text class="h" x="286" y="378">Bajo lock</text>
+  <text class="t" x="286" y="400">Último JPEG + frame</text>
+  <text class="m" x="286" y="420">bytes inmutables</text>
+  <text class="m" x="286" y="438">status() lee un snapshot</text>
+  <text class="m" x="286" y="456">Sin copia por cliente</text>
+
+  <rect class="accentPanel" x="40" y="330" width="198" height="136" rx="12"/>
+  <text class="step" x="56" y="354">10 · CLIENTES</text>
+  <text class="h" x="56" y="378">MJPEG</text>
+  <text class="t" x="56" y="400">multipart/x-mixed-replace</text>
+  <text class="m" x="56" y="420">boundary=frame</text>
+  <text class="m" x="56" y="438">N navegadores → 1 coste</text>
+  <text class="m" x="56" y="456">yield solo si cambia</text>
+
+  <line class="arrow" x1="948" y1="398" x2="920" y2="398" marker-end="url(#arrow)"/>
+  <line class="arrow" x1="726" y1="398" x2="698" y2="398" marker-end="url(#arrow)"/>
+  <line class="arrow" x1="490" y1="398" x2="462" y2="398" marker-end="url(#arrow)"/>
+  <line class="arrow" x1="268" y1="398" x2="240" y2="398" marker-end="url(#arrow)"/>
+
+  <!-- Bottom -->
+  <rect class="warnPanel" x="40" y="540" width="520" height="126" rx="12"/>
+  <text class="h2" x="58" y="566">RAMA IDLE · SIN CLIENTES MJPEG</text>
+  <text class="t" x="58" y="590">El worker lee la cámara cada 250 ms y conserva el frame para snapshots.</text>
+  <text class="m" x="58" y="612">No ejecuta Haar, ni la red, ni cv2.imencode. `add_client()` lo despierta.</text>
+  <text class="m" x="58" y="634">CPU en reposo casi nula; el stream se reanuda al abrir la UI.</text>
+
+  <rect class="panel" x="590" y="540" width="300" height="126" rx="12"/>
+  <text class="h2" x="608" y="566">SNAPSHOT · OPCIONAL</text>
+  <text class="t" x="608" y="590">POST /api/snapshot</text>
+  <text class="m" x="608" y="610">PIL quality 92 o fallback JPEG</text>
+  <text class="m" x="608" y="630">SNAP_FOLDER dentro del proyecto</text>
+  <text class="m" x="608" y="650">Rate-limit 2 s · apagado por defecto</text>
+
+  <rect class="panel" x="920" y="540" width="240" height="126" rx="12"/>
+  <text class="h2" x="938" y="566">CONTRATO</text>
+  <text class="t" x="938" y="590">1 productor</text>
+  <text class="t" x="938" y="610">N consumidores</text>
+  <text class="m" x="938" y="632">Estado en memoria</text>
+  <text class="m" x="938" y="650">workers = 1 obligatorio</text>
+
+  <line class="arrowAmber" x1="560" y1="603" x2="588" y2="603" marker-end="url(#arrowAmber)"/>
+  <line class="arrowMuted" x1="890" y1="603" x2="918" y2="603" marker-end="url(#arrowMuted)"/>
+
+  <text class="m" x="40" y="724">La tasa efectiva de inferencia es aproximadamente FPS / INFER_EVERY_N; si no hay caras, se detecta en el siguiente frame.</text>
+  <text class="m" x="40" y="746">Cifras de FPS: medición parcial con IP Webcam en la placa; no se midió con la Brio USB ni con Caffe. Ver README, “Rendimiento real”.</text>
+  <text class="m" x="1160" y="746" text-anchor="end">Fuente: app/main.py · app/detector.py</text>
+</svg>

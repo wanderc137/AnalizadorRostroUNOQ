@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="780" viewBox="0 0 1200 780" role="img" aria-labelledby="title desc">
+  <title id="title">Arquitectura de AnalizadorRostroUNOQ</title>
+  <desc id="desc">Navegador en la LAN, app FastAPI en el MPU Linux de la Arduino UNO Q, pipeline de video, camara IP o USB, modelos ONNX y Caffe. El MCU STM32U585 no participa.</desc>
+  <defs>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#16202c" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="panelGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#141e2a"/>
+      <stop offset="1" stop-color="#0f1721"/>
+    </linearGradient>
+    <linearGradient id="boardGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10222a"/>
+      <stop offset="1" stop-color="#0d1820"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4fd1c5"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#63b3ed"/>
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f6ad55"/>
+    </marker>
+    <marker id="arrowMuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b98a9"/>
+    </marker>
+    <style>
+      .bg { fill: #0b1017; }
+      .panel { fill: url(#panelGrad); stroke: #263244; stroke-width: 1.2; }
+      .panel2 { fill: #0e1620; stroke: #223042; stroke-width: 1; }
+      .board { fill: url(#boardGrad); stroke: #2f5a5c; stroke-width: 1.6; }
+      .dashed { fill: #0d141d; stroke: #3a4658; stroke-width: 1.2; stroke-dasharray: 6 5; }
+      .title { fill: #e6edf3; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 30px; font-weight: 700; letter-spacing: 0.2px; }
+      .subtitle { fill: #8b98a9; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 14px; }
+      .h { fill: #e6edf3; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 15px; font-weight: 650; }
+      .h2 { fill: #4fd1c5; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.8px; }
+      .t { fill: #c7d2df; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 12.5px; }
+      .m { fill: #8b98a9; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 11.5px; }
+      .mono { fill: #a9e8df; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 11.5px; }
+      .amberText { fill: #f6ad55; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 600; }
+      .blueText { fill: #63b3ed; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 600; }
+      .pill { fill: #16232f; stroke: #2b3c50; stroke-width: 1; }
+      .pillText { fill: #b9c7d6; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 10.5px; }
+      .arrow { stroke: #4fd1c5; stroke-width: 2; fill: none; }
+      .arrowBlue { stroke: #63b3ed; stroke-width: 2; fill: none; }
+      .arrowAmber { stroke: #f6ad55; stroke-width: 2; fill: none; }
+      .arrowMuted { stroke: #8b98a9; stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
+      .dot { fill: #4fd1c5; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="780"/>
+  <rect x="0" y="0" width="1200" height="780" fill="url(#grid)" opacity="0.55"/>
+
+  <text class="title" x="40" y="54">AnalizadorRostroUNOQ</text>
+  <text class="subtitle" x="40" y="78">Arquitectura de runtime · todo el procesamiento ocurre en el MPU Linux de la placa</text>
+  <circle cx="1148" cy="50" r="5" class="dot"/>
+  <text class="m" x="1138" y="55" text-anchor="end">v1.0.0</text>
+
+  <!-- Browser -->
+  <rect class="panel" x="32" y="118" width="288" height="220" rx="14"/>
+  <text class="h2" x="54" y="148">NAVEGADOR · LAN</text>
+  <text class="h" x="54" y="174">UI sin build step</text>
+  <text class="m" x="54" y="195">index.html · app.js · style.css</text>
+  <rect class="pill" x="54" y="212" width="242" height="26" rx="6"/>
+  <text class="pillText" x="64" y="229">&lt;img src="/video"&gt; · MJPEG</text>
+  <rect class="pill" x="54" y="244" width="242" height="26" rx="6"/>
+  <text class="pillText" x="64" y="261">GET /api/status · polling 1.2 s</text>
+  <rect class="pill" x="54" y="276" width="242" height="26" rx="6"/>
+  <text class="pillText" x="64" y="293">POST /api/* · X-Api-Token</text>
+  <text class="m" x="54" y="322">Mismo JPEG para todos los clientes</text>
+
+  <!-- HTTP arrow -->
+  <line class="arrowBlue" x1="320" y1="228" x2="356" y2="228" marker-end="url(#arrowBlue)"/>
+  <text class="blueText" x="338" y="214" text-anchor="middle">HTTP</text>
+  <text class="m" x="338" y="248" text-anchor="middle">:8000</text>
+
+  <!-- Board -->
+  <rect class="board" x="360" y="96" width="520" height="572" rx="18"/>
+  <text class="h2" x="384" y="126">ARDUINO UNO Q · MPU LINUX</text>
+  <text class="m" x="384" y="148">Qualcomm QRB2210 · ARM64 · Debian</text>
+
+  <rect class="panel" x="384" y="168" width="472" height="112" rx="12"/>
+  <text class="h" x="402" y="194">FastAPI + Uvicorn</text>
+  <text class="mono" x="402" y="216">app/main.py · 1 proceso, 1 worker</text>
+  <text class="m" x="402" y="238">GET / · /video · /api/status · /api/config · /healthz</text>
+  <text class="m" x="402" y="258">POST /api/camera/start|stop · POST /api/snapshot</text>
+  <text class="m" x="402" y="274">Lifespan: cámara → pipeline; stop inverso</text>
+
+  <rect class="panel" x="384" y="308" width="226" height="214" rx="12"/>
+  <text class="h2" x="402" y="334">VIDEOPIPELINE</text>
+  <text class="t" x="402" y="358">1 hilo productor</text>
+  <text class="t" x="402" y="380">frame → detección → overlay</text>
+  <text class="t" x="402" y="402">→ JPEG → publica bajo lock</text>
+  <text class="t" x="402" y="430">INFER_EVERY_N = 5</text>
+  <text class="t" x="402" y="452">EMA de FPS</text>
+  <text class="amberText" x="402" y="480">Sin clientes: idle 250 ms</text>
+  <text class="m" x="402" y="500">sin Haar, sin red, sin JPEG</text>
+
+  <rect class="panel" x="630" y="308" width="226" height="214" rx="12"/>
+  <text class="h2" x="648" y="334">MÓDULOS</text>
+  <text class="t" x="648" y="358">Camera</text>
+  <text class="m" x="648" y="376">V4L2 / FFmpeg + reconexión</text>
+  <text class="t" x="648" y="400">FaceDetector</text>
+  <text class="m" x="648" y="418">Haar frontal + overlay</text>
+  <text class="t" x="648" y="442">ModelHandle</text>
+  <text class="m" x="648" y="460">ONNX / Caffe / degradado</text>
+  <text class="m" x="648" y="492">ROI con margen del 6 %</text>
+
+  <rect class="panel2" x="384" y="548" width="472" height="48" rx="9"/>
+  <text class="mono" x="402" y="570">bind 0.0.0.0:8000</text>
+  <text class="m" x="402" y="586">Sin TLS · API_TOKEN opcional para POST · /video abierto</text>
+
+  <line class="arrow" x1="620" y1="280" x2="620" y2="306" marker-end="url(#arrow)"/>
+  <line class="arrow" x1="500" y1="280" x2="500" y2="306" marker-end="url(#arrow)"/>
+  <line class="arrowMuted" x1="610" y1="400" x2="628" y2="400" marker-end="url(#arrowMuted)"/>
+
+  <!-- MCU -->
+  <rect class="dashed" x="360" y="690" width="520" height="56" rx="10"/>
+  <text class="amberText" x="384" y="714">MCU STM32U585 · Zephyr</text>
+  <text class="m" x="384" y="733">No participa: sin firmware, sin GPIO, sin ADC ni enlace MPU↔MCU</text>
+
+  <!-- Models -->
+  <rect class="panel" x="920" y="118" width="248" height="196" rx="14"/>
+  <text class="h2" x="940" y="146">MODELOS</text>
+  <text class="h" x="940" y="172">ONNX UTKFace</text>
+  <text class="m" x="940" y="192">MobileNetV2 · 224×224 · 8 clases</text>
+  <text class="h" x="940" y="218">Caffe Levi &amp; Hassner</text>
+  <text class="m" x="940" y="238">age_net / gender_net · 227×227</text>
+  <text class="h" x="940" y="264">none</text>
+  <text class="m" x="940" y="284">solo detección (modo degradado)</text>
+  <text class="m" x="940" y="304">Carga en memoria; nunca en la nube</text>
+
+  <!-- Camera -->
+  <rect class="panel" x="920" y="348" width="248" height="176" rx="14"/>
+  <text class="h2" x="940" y="376">CÁMARA</text>
+  <text class="h" x="940" y="402">IP Webcam / cámara IP</text>
+  <text class="m" x="940" y="422">WiFi · MJPEG / RTSP</text>
+  <text class="m" x="940" y="442">CAMERA_SOURCE=http://…/video</text>
+  <text class="h" x="940" y="470">Logitech Brio (UVC)</text>
+  <text class="m" x="940" y="490">USB · requiere host mode</text>
+  <text class="m" x="940" y="510">hub USB-C PD o VIN + JCTL</text>
+
+  <!-- Storage -->
+  <rect class="panel" x="920" y="558" width="248" height="110" rx="14"/>
+  <text class="h2" x="940" y="586">PERSISTENCIA</text>
+  <text class="m" x="940" y="610">Snapshots OFF por defecto</text>
+  <text class="m" x="940" y="630">SNAP_FOLDER dentro del proyecto</text>
+  <text class="m" x="940" y="650">Modelos locales, gitignored</text>
+
+  <line class="arrowAmber" x1="888" y1="230" x2="918" y2="230" marker-end="url(#arrowAmber)"/>
+  <text class="amberText" x="904" y="216" text-anchor="middle">carga</text>
+  <line class="arrow" x1="888" y1="430" x2="918" y2="430" marker-end="url(#arrow)"/>
+  <text class="m" x="904" y="416" text-anchor="middle">frames</text>
+  <line class="arrowMuted" x1="888" y1="600" x2="918" y2="600" marker-end="url(#arrowMuted)"/>
+
+  <text class="m" x="40" y="758">Un solo productor de vídeo y muchos consumidores: N navegadores no multiplican la inferencia.</text>
+  <text class="m" x="1160" y="758" text-anchor="end">Fuente: código de app/ y docs/developer.md</text>
+</svg>

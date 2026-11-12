@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="740" viewBox="0 0 1200 740" role="img" aria-labelledby="title desc">
+  <title id="title">Despliegue de AnalizadorRostroUNOQ</title>
+  <desc id="desc">Flujo de despliegue desde el host de desarrollo a la Arduino UNO Q por ADB USB o SSH, con venv, dependencias, servicio y cámara IP o USB. El navegador consume la UI en el puerto 8000.</desc>
+  <defs>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#16202c" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="panelGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#141e2a"/>
+      <stop offset="1" stop-color="#0f1721"/>
+    </linearGradient>
+    <linearGradient id="boardGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10222a"/>
+      <stop offset="1" stop-color="#0d1820"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4fd1c5"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#63b3ed"/>
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f6ad55"/>
+    </marker>
+    <style>
+      .bg { fill: #0b1017; }
+      .panel { fill: url(#panelGrad); stroke: #263244; stroke-width: 1.2; }
+      .board { fill: url(#boardGrad); stroke: #2f5a5c; stroke-width: 1.6; }
+      .dashed { fill: #0d141d; stroke: #3a4658; stroke-width: 1.2; stroke-dasharray: 6 5; }
+      .title { fill: #e6edf3; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 30px; font-weight: 700; }
+      .subtitle { fill: #8b98a9; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 14px; }
+      .h { fill: #e6edf3; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 15px; font-weight: 650; }
+      .h2 { fill: #4fd1c5; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.7px; }
+      .t { fill: #c7d2df; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 12px; }
+      .m { fill: #8b98a9; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 11px; }
+      .mono { fill: #a9e8df; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 11px; }
+      .amber { fill: #f6ad55; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 11.5px; font-weight: 600; }
+      .blue { fill: #63b3ed; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 11.5px; font-weight: 600; }
+      .arrow { stroke: #4fd1c5; stroke-width: 2.4; fill: none; }
+      .arrowBlue { stroke: #63b3ed; stroke-width: 2.4; fill: none; }
+      .arrowAmber { stroke: #f6ad55; stroke-width: 2; fill: none; }
+      .pill { fill: #16232f; stroke: #2b3c50; stroke-width: 1; }
+      .pillText { fill: #b9c7d6; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 10.5px; }
+      .dot { fill: #4fd1c5; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="740"/>
+  <rect x="0" y="0" width="1200" height="740" fill="url(#grid)" opacity="0.55"/>
+
+  <text class="title" x="40" y="52">Despliegue</text>
+  <text class="subtitle" x="40" y="76">Del repositorio a la placa: copia por ADB o SSH, venv en la UNO Q y servicio persistente</text>
+  <circle cx="1148" cy="48" r="5" class="dot"/>
+  <text class="m" x="1138" y="53" text-anchor="end">sin arduino-cli</text>
+
+  <!-- Host -->
+  <rect class="panel" x="32" y="112" width="330" height="458" rx="16"/>
+  <text class="h2" x="54" y="142">HOST DE DESARROLLO</text>
+  <text class="h" x="54" y="170">PC Linux / macOS / Windows</text>
+  <text class="m" x="54" y="192">Repositorio + Python + ADB/SSH</text>
+
+  <rect class="pill" x="54" y="212" width="286" height="32" rx="6"/>
+  <text class="pillText" x="66" y="232">app/ · static/ · scripts/ · training/</text>
+  <rect class="pill" x="54" y="252" width="286" height="32" rx="6"/>
+  <text class="pillText" x="66" y="272">requirements.txt · .env.example</text>
+  <rect class="pill" x="54" y="292" width="286" height="32" rx="6"/>
+  <text class="pillText" x="66" y="312">models/utkface_mobilenetv2.onnx</text>
+  <rect class="pill" x="54" y="332" width="286" height="32" rx="6"/>
+  <text class="pillText" x="66" y="352">scripts/deploy_unoq.sh</text>
+
+  <text class="h" x="54" y="398">Dos caminos</text>
+  <text class="t" x="54" y="422">ADB USB → placa conectada</text>
+  <text class="t" x="54" y="444">SSH LAN → UNOQ_HOST</text>
+  <text class="m" x="54" y="468">El script no copia .env</text>
+  <text class="m" x="54" y="488">El setup crea .venv e instala</text>
+  <text class="m" x="54" y="508">Descarga modelos si --model</text>
+  <text class="m" x="54" y="540">También corre en un PC para</text>
+  <text class="m" x="54" y="558">probar la UI con webcam local</text>
+
+  <!-- Deployment arrows -->
+  <line class="arrow" x1="362" y1="250" x2="548" y2="250" marker-end="url(#arrow)"/>
+  <text class="h" x="455" y="232" text-anchor="middle">ADB</text>
+  <text class="m" x="455" y="272" text-anchor="middle">USB · push + shell</text>
+  <line class="arrowBlue" x1="362" y1="400" x2="548" y2="400" marker-end="url(#arrowBlue)"/>
+  <text class="h" x="455" y="382" text-anchor="middle">SSH</text>
+  <text class="m" x="455" y="422" text-anchor="middle">rsync / scp · LAN</text>
+  <text class="m" x="455" y="458" text-anchor="middle">UNOQ_HOST=192.0.2.50</text>
+
+  <!-- Board -->
+  <rect class="board" x="560" y="92" width="380" height="548" rx="18"/>
+  <text class="h2" x="584" y="122">ARDUINO UNO Q</text>
+  <text class="m" x="584" y="144">MPU Linux · QRB2210 · ARM64 · Debian</text>
+
+  <rect class="panel" x="584" y="166" width="332" height="84" rx="10"/>
+  <text class="h" x="600" y="190">~/ArduinoApps/AnalizadorRostroUNOQ</text>
+  <text class="m" x="600" y="212">app/ · python/ · static/ · scripts/ · models/</text>
+  <text class="m" x="600" y="232">requirements.txt · app.yaml · .env</text>
+
+  <rect class="panel" x="584" y="266" width="332" height="92" rx="10"/>
+  <text class="h" x="600" y="290">Entorno aislado</text>
+  <text class="mono" x="600" y="312">python3 -m venv .venv</text>
+  <text class="mono" x="600" y="332">.venv/bin/pip install -r requirements.txt</text>
+  <text class="m" x="600" y="350">opencv-python-headless · FastAPI · NumPy</text>
+
+  <rect class="panel" x="584" y="374" width="332" height="86" rx="10"/>
+  <text class="h" x="600" y="398">Ejecución</text>
+  <text class="mono" x="600" y="420">./scripts/run.sh</text>
+  <text class="m" x="600" y="440">o servicio systemd unoq-app</text>
+  <text class="m" x="600" y="456">bind 0.0.0.0:8000</text>
+
+  <rect class="panel" x="584" y="476" width="332" height="76" rx="10"/>
+  <text class="h" x="600" y="500">Estado</text>
+  <text class="m" x="600" y="520">GET /healthz · GET /api/status</text>
+  <text class="m" x="600" y="538">Cámara, modelo, FPS y errores</text>
+
+  <text class="m" x="584" y="580">Deploy idempotente: setup_board.sh crea .venv,</text>
+  <text class="m" x="584" y="598">instala requirements y copia .env.example → .env.</text>
+
+  <!-- Camera -->
+  <rect class="panel" x="978" y="112" width="190" height="150" rx="12"/>
+  <text class="h2" x="996" y="138">CÁMARA IP</text>
+  <text class="t" x="996" y="162">IP Webcam / MJPEG</text>
+  <text class="m" x="996" y="182">WiFi · sin ocupar USB</text>
+  <text class="mono" x="996" y="204">CAMERA_SOURCE=</text>
+  <text class="mono" x="996" y="222">http://IP:8080/video</text>
+  <text class="m" x="996" y="246">Opción validada</text>
+
+  <rect class="panel" x="978" y="288" width="190" height="150" rx="12"/>
+  <text class="h2" x="996" y="314">BRIO USB</text>
+  <text class="t" x="996" y="338">UVC / V4L2</text>
+  <text class="m" x="996" y="358">/dev/video0</text>
+  <text class="m" x="996" y="378">Requiere host mode:</text>
+  <text class="m" x="996" y="396">hub USB-C PD o</text>
+  <text class="m" x="996" y="414">VIN + JCTL</text>
+  <text class="amber" x="996" y="434">No validado en hardware</text>
+
+  <rect class="panel" x="978" y="464" width="190" height="120" rx="12"/>
+  <text class="h2" x="996" y="490">NAVEGADOR</text>
+  <text class="t" x="996" y="514">PC / móvil en LAN</text>
+  <text class="mono" x="996" y="536">http://IP:8000/</text>
+  <text class="m" x="996" y="558">Stream MJPEG + UI</text>
+
+  <line class="arrowAmber" x1="976" y1="190" x2="944" y2="190" marker-end="url(#arrowAmber)"/>
+  <text class="amber" x="960" y="176" text-anchor="middle">WiFi</text>
+  <line class="arrow" x1="976" y1="360" x2="944" y2="360" marker-end="url(#arrow)"/>
+  <text class="m" x="960" y="346" text-anchor="middle">USB</text>
+  <line class="arrowBlue" x1="944" y1="520" x2="976" y2="520" marker-end="url(#arrowBlue)"/>
+  <text class="blue" x="960" y="506" text-anchor="middle">HTTP</text>
+
+  <!-- MCU -->
+  <rect class="dashed" x="560" y="666" width="608" height="48" rx="10"/>
+  <text class="amber" x="584" y="688">MCU STM32U585 · Zephyr</text>
+  <text class="m" x="584" y="705">No se programa en este proyecto: no hay sketch .ino ni firmware; el despliegue es Python en el MPU.</text>
+
+  <text class="m" x="40" y="724">No uses `arduino-cli upload`: el FQBN arduino:zephyr:unoq y /dev/ttyACM0 pertenecen al MCU, que aquí no ejecuta nada.</text>
+</svg>

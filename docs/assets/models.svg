@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="740" viewBox="0 0 1200 740" role="img" aria-labelledby="title desc">
+  <title id="title">Modelos de AnalizadorRostroUNOQ</title>
+  <desc id="desc">Dos backends de clasificación: ONNX MobileNetV2 entrenado con UTKFace y Caffe de Levi y Hassner, con sus entradas, preprocesados, salidas y buckets. Incluye modo degradado y métricas de test.</desc>
+  <defs>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+      <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#16202c" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="panelGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#141e2a"/>
+      <stop offset="1" stop-color="#0f1721"/>
+    </linearGradient>
+    <linearGradient id="onnxGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#10262a"/>
+      <stop offset="1" stop-color="#0d1a20"/>
+    </linearGradient>
+    <linearGradient id="caffeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#261d12"/>
+      <stop offset="1" stop-color="#1a140e"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4fd1c5"/>
+    </marker>
+    <marker id="arrowAmber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f6ad55"/>
+    </marker>
+    <marker id="arrowMuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#8b98a9"/>
+    </marker>
+    <style>
+      .bg { fill: #0b1017; }
+      .panel { fill: url(#panelGrad); stroke: #263244; stroke-width: 1.2; }
+      .onnx { fill: url(#onnxGrad); stroke: #2f5a5c; stroke-width: 1.5; }
+      .caffe { fill: url(#caffeGrad); stroke: #5c4526; stroke-width: 1.5; }
+      .none { fill: #0d141d; stroke: #3a4658; stroke-width: 1.2; stroke-dasharray: 6 5; }
+      .title { fill: #e6edf3; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 30px; font-weight: 700; }
+      .subtitle { fill: #8b98a9; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 14px; }
+      .h { fill: #e6edf3; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 15px; font-weight: 650; }
+      .h2 { fill: #4fd1c5; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.7px; }
+      .h2a { fill: #f6ad55; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.7px; }
+      .t { fill: #c7d2df; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 12px; }
+      .m { fill: #8b98a9; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 11px; }
+      .mono { fill: #a9e8df; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 11px; }
+      .monoAmber { fill: #f6c177; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 11px; }
+      .amber { fill: #f6ad55; font-family: Inter, 'Segoe UI', system-ui, sans-serif; font-size: 11.5px; font-weight: 600; }
+      .arrow { stroke: #4fd1c5; stroke-width: 2; fill: none; }
+      .arrowAmber { stroke: #f6ad55; stroke-width: 2; fill: none; }
+      .arrowMuted { stroke: #8b98a9; stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+      .dot { fill: #4fd1c5; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="740"/>
+  <rect x="0" y="0" width="1200" height="740" fill="url(#grid)" opacity="0.55"/>
+
+  <text class="title" x="40" y="52">Modelos y contrato de inferencia</text>
+  <text class="subtitle" x="40" y="76">Dos backends intercambiables, un solo contrato: rostro BGR → género y rango de edad</text>
+  <circle cx="1148" cy="48" r="5" class="dot"/>
+  <text class="m" x="1138" y="53" text-anchor="end">MODEL_BACKEND</text>
+
+  <!-- Input -->
+  <rect class="panel" x="32" y="286" width="196" height="150" rx="12"/>
+  <text class="h2" x="50" y="312">ENTRADA</text>
+  <text class="h" x="50" y="338">ROI de rostro</text>
+  <text class="t" x="50" y="360">Frame BGR</text>
+  <text class="m" x="50" y="380">Caja Haar + margen 6 %</text>
+  <text class="m" x="50" y="400">Se recorta antes del</text>
+  <text class="m" x="50" y="418">preprocesado del backend</text>
+
+  <!-- ONNX -->
+  <rect class="onnx" x="280" y="92" width="340" height="228" rx="14"/>
+  <text class="h2" x="302" y="120">ONNX · MODELO PROPIO</text>
+  <text class="h" x="302" y="146">UTKFace MobileNetV2</text>
+  <text class="t" x="302" y="170">224×224 · RGB · NCHW</text>
+  <text class="mono" x="302" y="192">(x / 127.5) - 1 · swapRB=True</text>
+  <text class="m" x="302" y="214">Backbone congelado + 2 cabezas</text>
+  <text class="m" x="302" y="232">Entrenado con UTKFace (8 buckets)</text>
+  <text class="m" x="302" y="250">10.211.778 bytes · opset 13</text>
+  <text class="m" x="302" y="268">SHA256 390ade0e…a30c1661</text>
+  <text class="mono" x="302" y="294">models/utkface_mobilenetv2.onnx</text>
+
+  <!-- Caffe -->
+  <rect class="caffe" x="280" y="386" width="340" height="214" rx="14"/>
+  <text class="h2a" x="302" y="414">CAFFE · FALLBACK</text>
+  <text class="h" x="302" y="440">Levi &amp; Hassner (2015)</text>
+  <text class="t" x="302" y="464">227×227 · media BGR</text>
+  <text class="monoAmber" x="302" y="486">sin swapRB</text>
+  <text class="m" x="302" y="508">age_net · gender_net</text>
+  <text class="m" x="302" y="526">Pesos de smahesh29/Gender-and-Age-Detection</text>
+  <text class="m" x="302" y="544">~88 MB en models/fallback/</text>
+  <text class="m" x="302" y="562">No se versiona en Git</text>
+  <text class="monoAmber" x="302" y="586">deploy_*.prototxt + *.caffemodel</text>
+
+  <!-- ONNX outputs -->
+  <rect class="panel" x="676" y="92" width="286" height="228" rx="14"/>
+  <text class="h2" x="696" y="120">SALIDA ONNX</text>
+  <text class="h" x="696" y="146">Dos tensores</text>
+  <text class="t" x="696" y="170">gender: sigmoide (1)</text>
+  <text class="m" x="696" y="190">0 = Masculino · 1 = Femenino</text>
+  <text class="t" x="696" y="216">age: softmax (8)</text>
+  <text class="m" x="696" y="236">orden de AGE_BUCKETS</text>
+  <text class="mono" x="696" y="258">0-2 · 3-9 · 10-19 · 20-29</text>
+  <text class="mono" x="696" y="276">30-39 · 40-49 · 50-59 · 60+</text>
+  <text class="m" x="696" y="300">Buckets configurables en .env</text>
+
+  <!-- Caffe outputs -->
+  <rect class="panel" x="676" y="386" width="286" height="214" rx="14"/>
+  <text class="h2a" x="696" y="414">SALIDA CAFFE</text>
+  <text class="h" x="696" y="440">Dos tensores</text>
+  <text class="t" x="696" y="464">gender: 2 clases</text>
+  <text class="m" x="696" y="484">0 = Masculino · 1 = Femenino</text>
+  <text class="t" x="696" y="510">age: 8 clases fijas</text>
+  <text class="m" x="696" y="530">Buckets distintos a UTKFace</text>
+  <text class="monoAmber" x="696" y="552">0-2 · 4-6 · 8-12 · 15-20</text>
+  <text class="monoAmber" x="696" y="570">25-32 · 38-43 · 48-53 · 60-100</text>
+  <text class="m" x="696" y="592">AGE_BUCKETS no aplica</text>
+
+  <!-- Decision -->
+  <rect class="panel" x="1004" y="250" width="164" height="206" rx="12"/>
+  <text class="h2" x="1022" y="276">SELECCIÓN</text>
+  <text class="mono" x="1022" y="300">auto</text>
+  <text class="m" x="1022" y="320">ONNX si existe</text>
+  <text class="m" x="1022" y="338">→ Caffe si existe</text>
+  <text class="m" x="1022" y="356">→ none</text>
+  <text class="t" x="1022" y="384">utkface_onnx</text>
+  <text class="m" x="1022" y="402">fuerza ONNX</text>
+  <text class="t" x="1022" y="426">caffe</text>
+  <text class="m" x="1022" y="444">fuerza Caffe</text>
+
+  <!-- Degraded -->
+  <rect class="none" x="1004" y="486" width="164" height="114" rx="12"/>
+  <text class="amber" x="1022" y="512">MODO DEGRADADO</text>
+  <text class="m" x="1022" y="534">Sin modelo cargado</text>
+  <text class="m" x="1022" y="552">Cajas Haar siguen</text>
+  <text class="m" x="1022" y="570">Etiqueta “modelo no cargado”</text>
+
+  <!-- Arrows -->
+  <line class="arrow" x1="228" y1="340" x2="278" y2="210" marker-end="url(#arrow)"/>
+  <line class="arrowAmber" x1="228" y1="386" x2="278" y2="482" marker-end="url(#arrowAmber)"/>
+  <line class="arrow" x1="620" y1="206" x2="674" y2="206" marker-end="url(#arrow)"/>
+  <line class="arrowAmber" x1="620" y1="492" x2="674" y2="492" marker-end="url(#arrowAmber)"/>
+  <line class="arrowMuted" x1="962" y1="330" x2="1002" y2="330" marker-end="url(#arrowMuted)"/>
+  <line class="arrowMuted" x1="962" y1="520" x2="1002" y2="520" marker-end="url(#arrowMuted)"/>
+
+  <!-- Metrics -->
+  <rect class="panel" x="280" y="626" width="682" height="76" rx="12"/>
+  <text class="h2" x="300" y="650">TEST UTKFACE · 2.371 IMÁGENES DE HOLDOUT</text>
+  <text class="t" x="300" y="674">Género 84.56 % · edad exacta 48.17 % · edad ±1 bucket 83.8 %</text>
+  <text class="m" x="300" y="692">Métricas del entrenamiento v1.0.0; no son un benchmark ni garantizan precisión en cámara real.</text>
+
+  <text class="m" x="40" y="682">La confianza mostrada es el promedio de las dos cabezas;</text>
+  <text class="m" x="40" y="700">no es una probabilidad calibrada.</text>
+  <text class="m" x="40" y="726">Cambiar buckets u orden invalida las etiquetas.</text>
+</svg>

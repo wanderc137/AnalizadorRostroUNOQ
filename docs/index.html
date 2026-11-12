@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rostros, edad y género. Todo en la placa. · AnalizadorRostro v1</title>
+<meta name="description" content="Analizador de rostros, edad y género sobre Arduino UNO Q v1: YuNet, tracker IoU, ONNX UTKFace, stream MJPEG y UI local en español.">
+<meta name="author" content="wanderc137">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Rostros, edad y género. Todo en la placa. · AnalizadorRostro v1">
+<meta property="og:description" content="Analizador de rostros, edad y género sobre Arduino UNO Q v1: YuNet, tracker IoU, ONNX UTKFace, stream MJPEG y UI local en español.">
+<meta property="og:url" content="https://wanderc137.github.io/AnalizadorRostroUNOQ/">
+<meta property="og:image" content="https://wanderc137.github.io/AnalizadorRostroUNOQ/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rostros, edad y género. Todo en la placa. · AnalizadorRostro v1">
+<meta name="twitter:description" content="Analizador de rostros, edad y género sobre Arduino UNO Q v1: YuNet, tracker IoU, ONNX UTKFace, stream MJPEG y UI local en español.">
+<meta name="twitter:image" content="https://wanderc137.github.io/AnalizadorRostroUNOQ/assets/og.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2305070c'/><rect x='22' y='22' width='56' height='56' rx='12' fill='none' stroke='%2322D3EE' stroke-width='7'/><circle cx='50' cy='50' r='9' fill='%2322D3EE'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scrollbar-width:none}
+::-webkit-scrollbar{width:0;height:0}
+::-webkit-scrollbar-track{background:#05070c}
+::-webkit-scrollbar-thumb{background:#2a3448;border-radius:999px;border:2px solid #05070c}
+::-webkit-scrollbar-thumb:hover{background:#3a4a66}
+body{
+  margin:0;background:#05070c;color:#e8edf6;
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+::selection{background:var(--accent);color:#04110c}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+h1,h2,h3,h4{font-family:'Space Grotesk','Inter',sans-serif;line-height:1.05;letter-spacing:-.03em;margin:0}
+p{margin:0}
+.mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+.wrap{width:min(1180px,calc(100% - 48px));margin:0 auto}
+.grid-overlay{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:64px 64px;
+  mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 30%,transparent 78%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 30%,transparent 78%);
+}
+.glow{
+  position:fixed;z-index:0;pointer-events:none;filter:blur(90px);opacity:.20;
+  width:720px;height:720px;border-radius:50%;
+}
+.glow.one{top:-340px;right:-180px;background:var(--accent)}
+.glow.two{top:380px;left:-380px;background:var(--accent2);opacity:.14}
+.nav{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  background:rgba(5,7,12,.72);border-bottom:1px solid rgba(255,255,255,.07);
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:-.02em}
+.brand-mark{
+  width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#05100c;
+  box-shadow:0 0 30px color-mix(in srgb,var(--accent) 35%,transparent);
+}
+.brand-mark svg{width:22px;height:22px;stroke:#05100c;fill:none;stroke-width:1.8}
+.brand small{display:block;font-size:10px;letter-spacing:.18em;color:#8b9ab0;font-weight:600;text-transform:uppercase}
+.nav-links{display:flex;align-items:center;gap:26px;font-size:14px;color:#a9b6c8}
+.nav-links a:hover{color:#fff}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:13px 22px;border-radius:12px;font-weight:650;font-size:14.5px;
+  border:1px solid transparent;transition:transform .2s ease,box-shadow .2s ease,background .2s ease;
+  white-space:nowrap;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn-primary{
+  background:linear-gradient(100deg,var(--accent),var(--accent2));color:#04110c;
+  box-shadow:0 12px 34px -12px color-mix(in srgb,var(--accent) 70%,transparent);
+}
+.btn-primary:hover{box-shadow:0 18px 44px -12px color-mix(in srgb,var(--accent) 80%,transparent)}
+.btn-ghost{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.14);color:#e8edf6}
+.btn-ghost:hover{background:rgba(255,255,255,.07)}
+.btn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2}
+.hero{position:relative;z-index:1;padding:96px 0 72px}
+.hero-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:64px;align-items:center}
+.eyebrow{
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:12px;margin-bottom:22px;
+}
+.eyebrow::before{content:"";width:34px;height:1px;background:var(--accent);opacity:.7}
+h1{font-size:clamp(42px,6.4vw,80px);font-weight:700;letter-spacing:-.045em}
+.grad{background:linear-gradient(100deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{font-size:clamp(17px,1.5vw,19px);color:#aab7c9;margin-top:24px;max-width:60ch}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+.hero-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.badge{
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;
+  padding:6px 11px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+  color:#9fb0c4;background:rgba(255,255,255,.025);
+}
+.hero-visual{position:relative}
+.visual-frame{
+  border:1px solid rgba(255,255,255,.11);border-radius:20px;overflow:hidden;
+  background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.012));
+  box-shadow:0 40px 90px -40px rgba(0,0,0,.9),0 0 0 1px rgba(255,255,255,.02) inset;
+  padding:14px;
+}
+.visual-frame img{border-radius:12px;width:100%}
+.visual-caption{font-size:11.5px;color:#7f8ea3;margin-top:12px;text-align:right;font-family:'JetBrains Mono',monospace;letter-spacing:.04em}
+.float-chip{
+  position:absolute;left:-22px;bottom:34px;display:flex;align-items:center;gap:10px;
+  background:rgba(9,13,21,.92);border:1px solid rgba(255,255,255,.14);border-radius:13px;
+  padding:11px 15px;font-size:12.5px;color:#c7d3e2;backdrop-filter:blur(10px);
+  box-shadow:0 20px 50px -20px #000;
+}
+.float-chip b{color:var(--accent);font-family:'Space Grotesk',sans-serif;font-size:16px}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 18%,transparent);animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+/* vending kiosk */
+.kiosk{
+  border:1px solid rgba(255,255,255,.13);border-radius:22px;padding:18px;
+  background:linear-gradient(165deg,#0b1019,#070a11 60%,#0a0f18);
+  box-shadow:0 45px 100px -45px #000,0 0 0 1px rgba(255,255,255,.02) inset;
+}
+.kiosk-head{display:flex;align-items:center;gap:9px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.12em;color:#8494a9;padding:2px 4px 14px;border-bottom:1px solid rgba(255,255,255,.07)}
+.kiosk-head .timer{margin-left:auto;color:var(--accent)}
+.kiosk-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 0}
+.prod{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.075);border-radius:13px;padding:12px;display:flex;align-items:center;gap:11px}
+.prod img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+.prod span{font-size:11.5px;color:#c3cfdd;display:block;line-height:1.25}
+.prod b{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent)}
+.kiosk-pay{display:flex;align-items:center;gap:12px;border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);background:color-mix(in srgb,var(--accent) 7%,transparent);border-radius:13px;padding:12px 14px}
+.kiosk-pay .sol{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04110c;font-size:23px;font-weight:800}
+.kiosk-pay small{display:block;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;color:#8ea0b5}
+.kiosk-pay strong{font-size:15px}
+.kiosk-pay .pill{margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;background:var(--accent);color:#04110c;padding:7px 11px;border-radius:8px;font-weight:700}
+.stats{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.018)}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat{padding:34px 26px;border-left:1px solid rgba(255,255,255,.06)}
+.stat:first-child{border-left:0;padding-left:0}
+.stat-value{font-family:'Space Grotesk',sans-serif;font-size:clamp(28px,3.4vw,42px);font-weight:700;letter-spacing:-.04em;background:linear-gradient(100deg,#fff,#a9b8cc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat-label{font-size:12px;color:#7f8ea3;letter-spacing:.04em;margin-top:3px}
+.section{position:relative;z-index:1;padding:96px 0}
+.section.tight{padding-top:56px}
+.section-head{max-width:780px;margin-bottom:44px}
+.kicker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+h2{font-size:clamp(30px,4.1vw,50px);font-weight:700}
+.section-sub{color:#97a6ba;font-size:17px;margin-top:16px;max-width:68ch}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{
+  border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:28px;
+  background:linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+}
+.card .icon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 12%,transparent);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);margin-bottom:18px}
+.card .icon svg{width:21px;height:21px;stroke:var(--accent);fill:none;stroke-width:1.8}
+.card h3{font-size:20px;margin-bottom:9px}
+.card p{color:#9dabbf;font-size:14.5px}
+.timeline{position:relative;margin-top:10px}
+.timeline::before{content:"";position:absolute;left:23px;top:12px;bottom:12px;width:1px;background:linear-gradient(var(--accent),rgba(255,255,255,.08))}
+.step{display:grid;grid-template-columns:48px 1fr;gap:22px;padding:19px 0;align-items:start}
+.step-num{
+  width:47px;height:47px;border-radius:50%;display:grid;place-items:center;
+  border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);
+  background:#080c14;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;
+  position:relative;z-index:1;box-shadow:0 0 26px -6px color-mix(in srgb,var(--accent) 45%,transparent);
+}
+.step-body h3{font-size:18px;margin-bottom:5px}
+.step-body p{color:#93a2b7;font-size:14.5px;max-width:78ch}
+.figure{
+  border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:16px;
+  background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,.008));
+}
+.figure img{width:100%;border-radius:12px}
+.figure figcaption{font-size:12px;color:#7f8ea3;margin-top:12px;font-family:'JetBrains Mono',monospace}
+.arch-points{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.arch-points .card{padding:20px}
+.arch-points .card h4{font-size:14.5px;margin-bottom:5px}
+.arch-points .card p{font-size:13px}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.feature{border:1px solid rgba(255,255,255,.085);border-radius:16px;padding:23px;background:rgba(255,255,255,.022);transition:border-color .2s,background .2s,transform .2s}
+.feature:hover{border-color:color-mix(in srgb,var(--accent) 38%,transparent);background:rgba(255,255,255,.038);transform:translateY(-3px)}
+.feature .icon{width:37px;height:37px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 10%,transparent);margin-bottom:15px}
+.feature .icon svg{width:19px;height:19px;stroke:var(--accent);fill:none;stroke-width:1.8}
+.feature h3{font-size:15.5px;margin-bottom:6px}
+.feature p{font-size:13.2px;color:#94a3b8;line-height:1.55}
+.stack-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:22px;align-items:start}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:7px 12px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:#aab8ca}
+.terminal{border:1px solid rgba(255,255,255,.13);border-radius:16px;overflow:hidden;background:#070a10;box-shadow:0 30px 70px -35px #000}
+.terminal-bar{display:flex;align-items:center;gap:7px;padding:12px 15px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.025)}
+.terminal-bar i{width:10px;height:10px;border-radius:50%;background:#ff5f57;display:block}
+.terminal-bar i:nth-child(2){background:#febc2e}
+.terminal-bar i:nth-child(3){background:#28c840}
+.terminal-bar span{margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#718197;letter-spacing:.08em}
+.terminal pre{margin:0;padding:20px;overflow:auto;font-family:'JetBrains Mono',monospace;font-size:12.2px;line-height:1.8;color:#c6d2e0}
+.terminal .p{color:var(--accent)}
+.terminal .c{color:#68788d}
+.note{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:12.5px;color:#8d9cb0;line-height:1.55}
+.note svg{width:16px;height:16px;stroke:var(--accent);fill:none;stroke-width:1.8;flex:0 0 auto;margin-top:2px}
+.docs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.doc-card{display:block;border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:24px;background:rgba(255,255,255,.022);transition:border-color .2s,transform .2s,background .2s}
+.doc-card:hover{border-color:color-mix(in srgb,var(--accent) 40%,transparent);transform:translateY(-3px);background:rgba(255,255,255,.04)}
+.doc-card .tag{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em;color:var(--accent);text-transform:uppercase}
+.doc-card h3{font-size:17px;margin:10px 0 6px}
+.doc-card p{font-size:13px;color:#93a2b7}
+.doc-card .arrow{display:flex;align-items:center;gap:6px;margin-top:16px;font-size:12.5px;color:#c2cfdf}
+.doc-card .arrow svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .2s}
+.doc-card:hover .arrow svg{transform:translateX(4px)}
+.gallery{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.gallery .figure{margin:0}
+.cta{position:relative;z-index:1;padding:40px 0 96px}
+.cta-card{
+  border-radius:24px;padding:52px;text-align:center;position:relative;overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+  background:
+    radial-gradient(700px 300px at 50% 0%,color-mix(in srgb,var(--accent) 16%,transparent),transparent 70%),
+    linear-gradient(160deg,rgba(255,255,255,.05),rgba(255,255,255,.012));
+}
+.cta-card h2{font-size:clamp(28px,3.7vw,42px)}
+.cta-card p{color:#9dabbf;max-width:62ch;margin:16px auto 0}
+.cta-card .hero-actions{justify-content:center}
+footer{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.08);padding:52px 0 36px;background:rgba(4,6,10,.6)}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px}
+.foot-brand{display:flex;align-items:center;gap:11px;font-weight:700;margin-bottom:12px}
+.foot-brand .brand-mark{width:32px;height:32px;border-radius:9px}
+.foot-p{font-size:13px;color:#8493a7;max-width:38ch}
+.foot h4{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#718197;margin-bottom:13px;font-weight:500}
+.foot-links{display:flex;flex-direction:column;gap:8px;font-size:13px;color:#9aa9bc}
+.foot-links a:hover{color:#fff}
+.foot-bottom{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.07);margin-top:38px;padding-top:22px;font-size:11.5px;color:#6f7f93;font-family:'JetBrains Mono',monospace}
+.reveal{opacity:1;transform:none;transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.live-dot{animation:none}html{scroll-behavior:auto}}
+@media (max-width:980px){
+  .hero-grid,.split,.stack-grid,.gallery{grid-template-columns:1fr}
+  .hero{padding-top:64px}
+  .hero-visual{order:-1}
+  .features{grid-template-columns:1fr 1fr}
+  .arch-points{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .stat:nth-child(3){border-left:0;padding-left:0}
+  .stat{border-top:1px solid rgba(255,255,255,.06)}
+  .stat:nth-child(-n+2){border-top:0}
+  .docs-grid{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}
+  .nav-links{display:none}
+}
+@media (max-width:620px){
+  .wrap{width:calc(100% - 32px)}
+  .features{grid-template-columns:1fr}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .stat{padding:24px 16px}
+  .cta-card{padding:34px 22px}
+  .float-chip{left:8px;bottom:16px}
+  .foot-grid{grid-template-columns:1fr}
+  .section{padding:72px 0}
+}
+</style>
+</head>
+<body style="--accent:#22D3EE;--accent2:#E879F9">
+<div class="grid-overlay"></div>
+<div class="glow one"></div>
+<div class="glow two"></div>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="#top">
+      <span class="brand-mark"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="3"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/><circle cx="12" cy="12" r="2.5"/></svg></span>
+      <span>AnalizadorRostro v1<small>Portfolio · IA &amp; APIs</small></span>
+    </a>
+    <nav class="nav-links" aria-label="Navegación">
+      <a href="#problema">Visión</a>
+      <a href="#como">Cómo funciona</a>
+      <a href="#arquitectura">Arquitectura</a>
+      <a href="#docs">Documentación</a>
+      <a class="btn btn-ghost" style="padding:9px 15px" href="https://github.com/wanderc137/AnalizadorRostroUNOQ" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <div class="eyebrow">ARDUINO UNO Q · VISIÓN ARTIFICIAL · V1</div>
+      <h1>Rostros, edad y género.<br><span class='grad'>Todo en la placa.</span></h1>
+      <p class="lead">La primera versión del analizador: YuNet, tracker IoU y clasificación ONNX sobre Arduino UNO Q, con stream MJPEG y una UI en español.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="https://github.com/wanderc137/AnalizadorRostroUNOQ" target="_blank" rel="noopener">Ver el repositorio <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-ghost" href="https://github.com/wanderc137/AnalizadorRostroUNOQ#readme" target="_blank" rel="noopener">Leer la documentación</a>
+      </div>
+      <div class="hero-badges"><span class="badge">Python</span><span class="badge">FastAPI</span><span class="badge">OpenCV YuNet</span><span class="badge">ONNX</span><span class="badge">UTKFace</span><span class="badge">MIT</span></div>
+    </div>
+    <div class="hero-visual">
+      <div class="visual-frame"><img src="assets/pipeline.svg" alt="Pipeline de detección, tracker y clasificación"></div>
+      <div class="visual-caption">docs/assets/pipeline.svg · detección, IoU y clasificación</div>
+      <div class="float-chip"><span class="live-dot"></span>&lt;span&gt;~15 fps&lt;/span&gt; con IP Webcam</div>
+    </div>
+  </div>
+</section>
+
+<section class="stats"><div class="wrap stats-grid"><div class="stat"><div class="stat-value">84,56 %</div><div class="stat-label">género en test</div></div><div class="stat"><div class="stat-value">48,17 %</div><div class="stat-label">edad exacta</div></div><div class="stat"><div class="stat-value">83,8 %</div><div class="stat-label">edad ±1 bucket</div></div><div class="stat"><div class="stat-value">~15 fps</div><div class="stat-label">UI con IP Webcam</div></div></div></section>
+
+<section class="section" id="problema">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">01 — La idea</div>
+      <h2>Visión artificial sin GPU y sin nube</h2>
+      <p class="section-sub">La v1 lleva detección y clasificación al QRB2210 y sirve el resultado como MJPEG dentro de la LAN. Es la base sobre la que se construyó la v2.</p>
+    </div>
+    <div class="split">
+      <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 9v5M12 17v.01"/></svg></div><h3>La visión que se va de la red</h3><p>Enviar cada frame a un servicio externo plantea privacidad, costo y latencia. Para un local, un evento o un prototipo, esa dependencia es difícil de justificar.</p></div>
+      <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg></div><h3>Inferencia edge, video local</h3><p>YuNet + tracker IoU + clasificador ONNX en la placa. El video se queda en la LAN y se sirve como stream MJPEG a cualquier navegador.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section tight" id="como">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">02 — El recorrido</div>
+      <h2>Cómo funciona, paso a paso</h2>
+      <p class="section-sub">Detección y clasificación separadas para gastar CPU solo cuando hace falta.</p>
+    </div>
+    <div class="timeline reveal"><div class="step"><div class="step-num">01</div><div class="step-body"><h3>Captura</h3><p>Cámara IP MJPEG por WiFi o Brio USB, con resolución reducida para el pipeline.</p></div></div><div class="step"><div class="step-num">02</div><div class="step-body"><h3>Detección</h3><p>YuNet a 320 px cada N frames, con fallback Haar si falta el modelo.</p></div></div><div class="step"><div class="step-num">03</div><div class="step-body"><h3>Tracker IoU</h3><p>Conserva la última predicción y evita el parpadeo de etiquetas entre frames.</p></div></div><div class="step"><div class="step-num">04</div><div class="step-body"><h3>Clasificación</h3><p>ONNX UTKFace o Caffe Levi & Hassner, en ciclos separados de la detección.</p></div></div><div class="step"><div class="step-num">05</div><div class="step-body"><h3>Anotación y stream</h3><p>Cajas, etiquetas y HUD sobre MJPEG para cualquier navegador de la red.</p></div></div></div>
+  </div>
+</section>
+
+<section class="section tight" id="arquitectura">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">03 — Bajo el capó</div>
+      <h2>Un pipeline con dos cadencias</h2>
+      <p class="section-sub">Detectar es caro; clasificar también. Separar los ciclos y reutilizar tracks es lo que permite mantener la UI fluida en CPU.</p>
+    </div>
+    <figure class="figure reveal"><img src="assets/pipeline.svg" alt="Pipeline de detección, tracker y clasificación" loading="lazy"><figcaption>docs/assets/pipeline.svg · detección, IoU y clasificación</figcaption></figure>
+    <div class="arch-points reveal"><div class="card"><h4>YuNet primero</h4><p>Detección frontal rápida y liviana, con Haar como red de seguridad.</p></div><div class="card"><h4>Tracker con memoria</h4><p>Un track desaparecido se conserva hasta dos frames para no perder la etiqueta.</p></div><div class="card"><h4>Modo reposo</h4><p>Sin clientes MJPEG no hay inferencia ni JPEG: la CPU queda casi libre.</p></div></div>
+  </div>
+</section>
+
+<section class="section tight">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">04 — Lo que lo hace distinto</div>
+      <h2>Decisiones de ingeniería</h2>
+      <p class="section-sub">La versión que abrió el camino: dataset, entrenamiento, runtime, UI y despliegue.</p>
+    </div>
+    <div class="features reveal"><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M8.5 15a4.5 4.5 0 0 0 7 0"/></svg></div><h3>YuNet + Haar</h3><p>Detección frontal con score 0.6 y NMS 0.3, y fallback clásico si falta el modelo.</p></div><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div><h3>Tracker IoU</h3><p>Empareja detecciones con tracks y conserva predicciones para estabilizar la UI.</p></div><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-1 5.8V16a3 3 0 0 0 3 3h1a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3Z"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 1 5.8V16a3 3 0 0 1-3 3h-1a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z"/><path d="M12 4v16"/></svg></div><h3>Dos backends</h3><p>ONNX propio entrenado con UTKFace o Caffe de Levi & Hassner; `auto` prefiere el ONNX.</p></div><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 15 3-4 3 2 4-6"/></svg></div><h3>Entrenamiento incluido</h3><p>Pipeline UTKFace con métricas de test: género 84,56 %, edad exacta 48,17 %, ±1 bucket 83,8 %.</p></div><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v11H3V8a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="4"/></svg></div><h3>MJPEG multi-cliente</h3><p>Stream para varios navegadores y snapshots, sin plugins en el cliente.</p></div><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m9 12 2 2 4-4"/></svg></div><h3>Privacidad por diseño</h3><p>Sin envío de frames a Internet; advertencias sobre datos biométricos y consentimiento.</p></div></div>
+  </div>
+</section>
+
+<section class="section tight"><div class="wrap"><div class="section-head reveal"><div class="kicker">05 — Diagramas</div><h2>El sistema, en dibujos</h2><p class="section-sub">Los diagramas se mantienen en el repositorio y se actualizan con el código.</p></div><div class="gallery"><figure class="figure"><img src="assets/architecture.svg" alt="AnalizadorRostro v1 — architecture" loading="lazy"><figcaption>Architecture</figcaption></figure><figure class="figure"><img src="assets/deployment.svg" alt="AnalizadorRostro v1 — deployment" loading="lazy"><figcaption>Deployment</figcaption></figure><figure class="figure"><img src="assets/models.svg" alt="AnalizadorRostro v1 — models" loading="lazy"><figcaption>Models</figcaption></figure></div></div></section>
+
+<section class="section tight">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">06 — Stack y arranque</div>
+      <h2>Con qué está construido</h2>
+      <p class="section-sub">OpenCV, ONNX Runtime y FastAPI sobre el Linux de la UNO Q; PyTorch solo para entrenar.</p>
+    </div>
+    <div class="stack-grid">
+      <div class="reveal">
+        <div class="chips"><span class="chip">Python</span><span class="chip">FastAPI</span><span class="chip">OpenCV</span><span class="chip">YuNet</span><span class="chip">ONNX Runtime</span><span class="chip">PyTorch</span><span class="chip">UTKFace</span><span class="chip">Caffe</span><span class="chip">MJPEG</span><span class="chip">Debian</span><span class="chip">QRB2210</span><span class="chip">IP Webcam</span></div>
+        <div class="note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m9 12 2 2 4-4"/></svg><span>No identifica personas: detecta rostros y estima atributos. Usalo con consentimiento, aviso claro y sin almacenar snapshots sin autorización.</span></div>
+      </div>
+      <div class="terminal reveal">
+        <div class="terminal-bar"><i></i><i></i><i></i><span>arrancar la v1</span></div>
+        <pre><span class="p">$</span> git clone https://github.com/wanderc137/AnalizadorRostroUNOQ
+<span class="p">$</span> cd AnalizadorRostroUNOQ
+<span class="p">$</span> python3 -m venv .venv && source .venv/bin/activate
+<span class="p">$</span> pip install -r requirements.txt
+<span class="p">$</span> ./scripts/download_model.sh
+<span class="p">$</span> python -m app.main
+<span class="c"># UI → http://&lt;IP_UNO_Q&gt;:8000/</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section tight" id="docs">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="kicker">07 — Documentación</div>
+      <h2>Todo está escrito</h2>
+      <p class="section-sub">Cada decisión, cada límite y cada comando están documentados en el repositorio. Sin folletos: lo que funciona se muestra, lo que no, también.</p>
+    </div>
+    <div class="docs-grid reveal"><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/datasheet.md" target="_blank" rel="noopener"><span class="tag">Manual</span><h3>Datasheet</h3><p>Instalación, operación, configuración, API y privacidad.</p><span class="arrow">Abrir documento <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/developer.md" target="_blank" rel="noopener"><span class="tag">Código</span><h3>Guía de desarrollador</h3><p>Módulos, hilos, frontend, entrenamiento y extensión.</p><span class="arrow">Abrir documento <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/BITACORA.md" target="_blank" rel="noopener"><span class="tag">Historia</span><h3>Bitácora</h3><p>Decisiones, pruebas y evolución de la v1.</p><span class="arrow">Abrir documento <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/REFERENCES.md" target="_blank" rel="noopener"><span class="tag">Fuentes</span><h3>Referencias</h3><p>YuNet, UTKFace, ONNX, FastAPI y MJPEG.</p><span class="arrow">Abrir documento <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <div class="cta-card reveal">
+      <div class="kicker" style="justify-content:center">Portfolio · 21 proyectos</div>
+      <h2>¿Construimos algo así?</h2>
+      <p>La v1 es la base real del analizador: visión artificial en el borde, sin GPU y sin mandar video a la nube.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="https://wanderc137.github.io/" target="_blank" rel="noopener">Ver todos los proyectos <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-ghost" href="https://github.com/wanderc137/AnalizadorRostroUNOQ" target="_blank" rel="noopener">Explorar el código</a>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand"><span class="brand-mark"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="3"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/><circle cx="12" cy="12" r="2.5"/></svg></span>AnalizadorRostro v1</div>
+        <p class="foot-p">Analizador de rostros, género y edad sobre Arduino UNO Q: YuNet, ONNX, UTKFace y MJPEG 100 % local.</p>
+      </div>
+      <div>
+        <h4>Este proyecto</h4>
+        <div class="foot-links">
+          <a href="https://github.com/wanderc137/AnalizadorRostroUNOQ" target="_blank" rel="noopener">Repositorio en GitHub</a>
+          <a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/README.md" target="_blank" rel="noopener">README técnico</a>
+          <a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/datasheet.md" target="_blank" rel="noopener">Datasheet</a>
+          <a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/BITACORA.md" target="_blank" rel="noopener">Guía de desarrollador</a>
+          <a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/REFERENCES.md" target="_blank" rel="noopener">Referencias</a>
+        </div>
+      </div>
+      <div>
+        <h4>Otros proyectos</h4>
+        <div class="foot-links"><a href="https://wanderc137.github.io/proxy-openrouter-ia-chinas/">OpenRouter Proxy</a><a href="https://wanderc137.github.io/netEspNow-v1.4/">netEspNow</a><a href="https://wanderc137.github.io/nb2700-telemetria/">NB2700 Telemetría</a><a href="https://wanderc137.github.io/mega-free-chat/">Mega Free Chat</a><a href="https://wanderc137.github.io/CubeCell-LoRaWAN-Node-v1.3/">CubeCell LoRaWAN Bridge v1.3</a><a href="https://wanderc137.github.io/CashDroController/">CashDro Controller</a><a href="https://wanderc137.github.io/BusAccel-8266-v4/">BusAccel</a><a href="https://wanderc137.github.io/SpeechToTextAuxPy/">SpeechToText Aux</a><a href="https://wanderc137.github.io/teleAsistenciaV1.3/">Alerta Mayor</a><a href="https://wanderc137.github.io/TotemAutoatencion/">Totem Autoatención</a><a href="https://wanderc137.github.io/turnero/">Turnero</a><a href="https://wanderc137.github.io/valvulas-zigbee/">Válvulas Zigbee</a><a href="https://wanderc137.github.io/mesacerca/">MesaCerca</a><a href="https://wanderc137.github.io/permaweb-app/">Permaweb App</a></div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span><a href="https://wanderc137.github.io/">Portfolio</a> · © 2026 wanderc137 · Licencia MIT</span>
+      <span>Diseñado y construido por wanderc137</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        io.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.12});
+  document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+})();
+</script>
+</body>
+</html>

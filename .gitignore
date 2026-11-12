@@ -1,0 +1,76 @@
+# Documentos internos del pipeline de desarrollo (no se publican)
+PLAN.md
+AUDIT_REPORT.md
+
+# Configuración con posibles secretos
+.env
+.env.*
+!.env.example
+!.env.sample
+backup-unoq/
+*.bak
+*.bak.*
+
+# Entornos virtuales
+venv/
+.venv/
+env/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Modelos (no se versionan: son assets de release o descargas locales)
+models/*.onnx
+models/*.h5
+models/*.keras
+models/*.tflite
+models/fallback/
+*.caffemodel
+*.prototxt
+
+# Dataset y artefactos de entrenamiento
+dataset/
+training/data/
+training/output/
+training/.kaggle/
+
+# Snapshots de rostros (datos biométricos)
+snapshots/
+*.jpg.tmp
+
+# Build / sistema / editor
+.arduino/
+node_modules/
+.DS_Store
+*.log
+*.swp
+*~
+.idea/
+.vscode/
+
+# ── Higiene de publicación (portfolio) ──────────────────────────────
+PLAN.md
+AUDIT_REPORT.md
+*.log
+.env
+.env.*
+!.env.example
+!.env.sample
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.DS_Store

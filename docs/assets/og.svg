@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22D3EE"/><stop offset="1" stop-color="#E879F9"/></linearGradient>
+    <radialGradient id="r1" cx="85%" cy="0%" r="70%"><stop offset="0" stop-color="#22D3EE" stop-opacity="0.30"/><stop offset="1" stop-color="#22D3EE" stop-opacity="0"/></radialGradient>
+    <radialGradient id="r2" cx="0%" cy="100%" r="65%"><stop offset="0" stop-color="#E879F9" stop-opacity="0.24"/><stop offset="1" stop-color="#E879F9" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#05070C"/>
+  <rect width="1200" height="630" fill="url(#r1)"/>
+  <rect width="1200" height="630" fill="url(#r2)"/>
+  <g stroke="rgba(255,255,255,0.05)" stroke-width="1">
+    <line x1="0" y1="0" x2="0" y2="630"/><line x1="60" y1="0" x2="60" y2="630"/><line x1="120" y1="0" x2="120" y2="630"/><line x1="180" y1="0" x2="180" y2="630"/><line x1="240" y1="0" x2="240" y2="630"/><line x1="300" y1="0" x2="300" y2="630"/><line x1="360" y1="0" x2="360" y2="630"/><line x1="420" y1="0" x2="420" y2="630"/><line x1="480" y1="0" x2="480" y2="630"/><line x1="540" y1="0" x2="540" y2="630"/><line x1="600" y1="0" x2="600" y2="630"/><line x1="660" y1="0" x2="660" y2="630"/><line x1="720" y1="0" x2="720" y2="630"/><line x1="780" y1="0" x2="780" y2="630"/><line x1="840" y1="0" x2="840" y2="630"/><line x1="900" y1="0" x2="900" y2="630"/><line x1="960" y1="0" x2="960" y2="630"/><line x1="1020" y1="0" x2="1020" y2="630"/><line x1="1080" y1="0" x2="1080" y2="630"/><line x1="1140" y1="0" x2="1140" y2="630"/><line x1="1200" y1="0" x2="1200" y2="630"/>
+    <line x1="0" y1="0" x2="1200" y2="0"/><line x1="0" y1="60" x2="1200" y2="60"/><line x1="0" y1="120" x2="1200" y2="120"/><line x1="0" y1="180" x2="1200" y2="180"/><line x1="0" y1="240" x2="1200" y2="240"/><line x1="0" y1="300" x2="1200" y2="300"/><line x1="0" y1="360" x2="1200" y2="360"/><line x1="0" y1="420" x2="1200" y2="420"/><line x1="0" y1="480" x2="1200" y2="480"/><line x1="0" y1="540" x2="1200" y2="540"/><line x1="0" y1="600" x2="1200" y2="600"/>
+  </g>
+  <rect x="60" y="52" width="46" height="46" rx="13" fill="url(#g)"/>
+  <circle cx="83" cy="75" r="7" fill="#05100C"/>
+  <text x="124" y="70" font-family="DejaVu Sans, Arial, sans-serif" font-size="16" font-weight="700" fill="#E8EDF6" letter-spacing="3">WANDERC137</text>
+  <text x="124" y="92" font-family="DejaVu Sans Mono, monospace" font-size="13" fill="#8EA0B5" letter-spacing="2">PORTFOLIO · IA &amp; APIS</text>
+  <line x1="90" y1="170" x2="260" y2="170" stroke="url(#g)" stroke-width="3"/>
+  <text x="90" y="250" font-family="DejaVu Sans, Arial, sans-serif" font-size="70" font-weight="700" fill="#F3F7FC" letter-spacing="-2">AnalizadorRostro v1</text><text x="90" y="332" font-family="DejaVu Sans, Arial, sans-serif" font-size="70" font-weight="700" fill="#F3F7FC" letter-spacing="-2">Rostros, edad y género en el borde</text>
+  <text x="92" y="440" font-family="DejaVu Sans, Arial, sans-serif" font-size="27" fill="#9FB0C6">YuNet · ONNX · UTKFace · Arduino UNO Q</text><text x="92" y="478" font-family="DejaVu Sans, Arial, sans-serif" font-size="27" fill="#9FB0C6">84,56 % género, 48,17 % edad exacta.</text>
+  <rect x="92" y="562" width="96" height="38" rx="19" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)"/><text x="106" y="587" font-family="DejaVu Sans Mono, monospace" font-size="17" fill="#B9C7D9">Python</text><rect x="200" y="562" width="109" height="38" rx="19" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)"/><text x="214" y="587" font-family="DejaVu Sans Mono, monospace" font-size="17" fill="#B9C7D9">FastAPI</text><rect x="321" y="562" width="174" height="38" rx="19" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)"/><text x="335" y="587" font-family="DejaVu Sans Mono, monospace" font-size="17" fill="#B9C7D9">OpenCV YuNet</text><rect x="507" y="562" width="70" height="38" rx="19" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.18)"/><text x="521" y="587" font-family="DejaVu Sans Mono, monospace" font-size="17" fill="#B9C7D9">ONNX</text>
+  <text x="1110" y="598" text-anchor="end" font-family="DejaVu Sans Mono, monospace" font-size="17" fill="#7F8EA3">github.com/wanderc137/AnalizadorRostroUNOQ</text>
+</svg>

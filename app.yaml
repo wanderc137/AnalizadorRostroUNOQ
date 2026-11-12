@@ -1,0 +1,9 @@
+# Descriptor opcional para Arduino App Lab (UNO Q).
+# La app también funciona standalone con scripts/run.sh.
+name: AnalizadorRostroUNOQ
+description: Detección de rostros y estimación de género/rango de edad en el MPU Linux.
+version: 1.0.0
+main: python/main.py
+ports:
+  - "8000:8000"
+bricks: []
