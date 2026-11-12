@@ -1,0 +1,118 @@
+/* Comunidad · FAQ, preguntas y monedas anónimas */
+.psc-section{
+  position:relative;
+  scroll-margin-top:86px;
+  padding:clamp(56px,8vw,96px) 0;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.psc-head{max-width:760px;margin-bottom:34px}
+.psc-kicker{
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--accent);
+}
+.psc-kicker::before{content:"";width:30px;height:1px;background:var(--accent);opacity:.75}
+.psc-head h2{
+  font-family:'Space Grotesk','Inter',sans-serif;font-size:clamp(32px,4.2vw,52px);
+  line-height:1.02;letter-spacing:-.045em;margin:0 0 14px;
+}
+.psc-head p{color:#a9b6c8;font-size:16px;line-height:1.65;margin:0;max-width:66ch}
+.psc-head .psc-grad{
+  background:linear-gradient(100deg,var(--accent),var(--accent2));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.psc-faq{display:flex;flex-direction:column;gap:9px;margin-bottom:34px}
+.psc-faq-item{
+  border:1px solid rgba(255,255,255,.1);border-radius:14px;
+  background:linear-gradient(180deg,rgba(14,20,31,.78),rgba(8,11,18,.72));
+  overflow:hidden;transition:border-color .18s,background .18s;
+}
+.psc-faq-item:hover{border-color:rgba(255,255,255,.18)}
+.psc-faq-item[open]{border-color:color-mix(in srgb,var(--accent) 42%,rgba(255,255,255,.12))}
+.psc-faq-item summary{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:16px 18px;cursor:pointer;list-style:none;
+  font-family:'Space Grotesk','Inter',sans-serif;font-size:15.5px;font-weight:600;letter-spacing:-.01em;
+}
+.psc-faq-item summary::-webkit-details-marker{display:none}
+.psc-faq-item summary .psc-plus{
+  flex:0 0 22px;width:22px;height:22px;border-radius:50%;
+  display:grid;place-items:center;border:1px solid rgba(255,255,255,.18);
+  color:var(--accent);font-size:15px;line-height:1;transition:transform .2s,background .2s;
+}
+.psc-faq-item[open] summary .psc-plus{transform:rotate(45deg);background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.psc-faq-body{padding:0 18px 17px;color:#a9b6c8;font-size:14.5px;line-height:1.7}
+.psc-faq-body code{font-family:'JetBrains Mono',monospace;font-size:.88em;color:#d8e4f5;background:rgba(255,255,255,.06);padding:2px 5px;border-radius:5px}
+.psc-coin-wrap{max-width:520px;margin:0 auto;width:100%}
+.psc-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:16px;align-items:stretch}
+.psc-card{
+  position:relative;border:1px solid rgba(255,255,255,.1);border-radius:18px;
+  background:linear-gradient(180deg,rgba(14,20,31,.82),rgba(8,11,18,.75));
+  padding:clamp(18px,2.6vw,28px);box-shadow:0 24px 70px rgba(0,0,0,.22);
+  overflow:hidden;
+}
+.psc-card::before{
+  content:"";position:absolute;inset:0 0 auto;height:1px;
+  background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent) 45%,transparent),transparent);
+  opacity:.6;
+}
+.psc-card h3{
+  font-family:'Space Grotesk','Inter',sans-serif;font-size:20px;letter-spacing:-.025em;margin:0 0 5px;
+}
+.psc-card .psc-sub{color:#8e9bb0;font-size:12.5px;line-height:1.5;margin:0 0 16px}
+.psc-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  border:1px solid rgba(255,255,255,.16);border-radius:10px;padding:9px 14px;
+  background:rgba(255,255,255,.03);color:#e8edf6;font:inherit;font-size:12px;font-weight:650;
+  cursor:pointer;transition:transform .14s,border-color .14s,background .14s,box-shadow .14s;
+}
+.psc-btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.06)}
+.psc-btn.primary{
+  background:linear-gradient(100deg,var(--accent),var(--accent2));border-color:transparent;color:#04110c;
+  box-shadow:0 10px 26px -12px color-mix(in srgb,var(--accent) 75%,transparent);
+}
+.psc-btn.primary:hover{filter:brightness(1.06);box-shadow:0 16px 34px -12px color-mix(in srgb,var(--accent) 80%,transparent)}
+.psc-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;filter:none}
+
+.psc-coin{display:flex;flex-direction:column;justify-content:space-between;min-height:100%}
+.psc-coin-top{text-align:center;padding:6px 0 12px}
+.psc-coin-icon{
+  width:74px;height:74px;margin:0 auto 10px;border-radius:50%;
+  display:grid;place-items:center;position:relative;
+  background:radial-gradient(circle at 30% 25%,#fff3b0,#f6c945 38%,#b8860b 72%,#6b4c00 100%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.2) inset,0 16px 45px rgba(246,201,69,.18);
+  animation:psc-float 4.5s ease-in-out infinite;
+}
+.psc-coin-icon::after{
+  content:"";position:absolute;inset:9px;border-radius:50%;border:1px dashed rgba(70,45,0,.38);
+}
+.psc-coin-icon svg{width:36px;height:36px;position:relative;z-index:1}
+.psc-coin-count{
+  font-family:'Space Grotesk','Inter',sans-serif;font-size:clamp(38px,5vw,54px);
+  line-height:1;letter-spacing:-.05em;font-weight:700;
+  background:linear-gradient(100deg,#fff0a8,#f6c945 55%,#d99a12);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.psc-coin-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:#8e9bb0;margin-top:7px}
+.psc-coin-copy{color:#a9b6c8;font-size:12.5px;line-height:1.6;text-align:center;margin:0 0 14px}
+.psc-coin-btn{width:100%}
+.psc-coin-msg{min-height:34px;text-align:center;font-size:11px;color:#8e9bb0;line-height:1.5;margin:10px 0 0}
+.psc-coin-msg.ok{color:#f6c945}
+.psc-coin-msg.bad{color:#ff9fb1}
+.psc-coin-small{font-size:10.5px;color:#6f7c91;text-align:center;line-height:1.5;margin:12px 0 0}
+.psc-coin-small strong{color:#a9b6c8;font-weight:600}
+@keyframes psc-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@media(max-width:860px){
+  .psc-grid{grid-template-columns:1fr}
+  .psc-coin{min-height:auto}
+}
+@media(max-width:560px){
+  .psc-faq-item summary{font-size:14px;padding:14px}
+  .psc-faq-body{padding:0 14px 15px;font-size:13.5px}
+  .psc-actions{width:100%}
+  .psc-actions .psc-btn{flex:1}
+}
+@media(prefers-reduced-motion:reduce){
+  .psc-coin-icon{animation:none}
+  .psc-btn,.psc-faq-item{transition:none}
+}

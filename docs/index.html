@@ -258,7 +258,7 @@ footer{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.08);pa
   .section{padding:72px 0}
 }
 </style>
-</head>
+<link rel="stylesheet" href="assets/community.css?v=5"></head>
 <body style="--accent:#22D3EE;--accent2:#E879F9">
 <div class="grid-overlay"></div>
 <div class="glow one"></div>
@@ -275,6 +275,7 @@ footer{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.08);pa
       <a href="#como">Cómo funciona</a>
       <a href="#arquitectura">Arquitectura</a>
       <a href="#docs">Documentación</a>
+      <a href="#comunidad">Comunidad</a>
       <a class="btn btn-ghost" style="padding:9px 15px" href="https://github.com/wanderc137/AnalizadorRostroUNOQ" target="_blank" rel="noopener">GitHub</a>
     </nav>
   </div>
@@ -394,8 +395,8 @@ footer{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.08);pa
   <div class="wrap">
     <div class="cta-card reveal">
       <div class="kicker" style="justify-content:center">Portfolio · 21 proyectos</div>
-      <h2>¿Construimos algo así?</h2>
-      <p>La v1 es la base real del analizador: visión artificial en el borde, sin GPU y sin mandar video a la nube.</p>
+      <h2>¿Te animás?</h2>
+      <p>Usá esto como base y referencia para entender la primera versión del analizador y usarla como base para visión en el borde. Este proyecto es la prueba de que se puede hacer con componentes reales.</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="https://wanderc137.github.io/" target="_blank" rel="noopener">Ver todos los proyectos <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
         <a class="btn btn-ghost" href="https://github.com/wanderc137/AnalizadorRostroUNOQ" target="_blank" rel="noopener">Explorar el código</a>
@@ -447,5 +448,8 @@ footer{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.08);pa
   document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
 })();
 </script>
+
+<script>window.PORTFOLIO_COMMUNITY = {"account": "wanderc137", "repo": "AnalizadorRostroUNOQ", "coinNamespace": "wanderc137-analizadorrostrounoq-coins-v1", "faqs": [{"q": "¿Qué diferencia hay con la v2?", "a": "La v1 es la base: Haar/YuNet + ONNX o Caffe, UI en <code>:8000</code>; la v2 refina el pipeline, la documentación y la experiencia."}, {"q": "¿Qué backend usa?", "a": "ONNX UTKFace 224×224 o Caffe Levi & Hassner, seleccionable por configuración."}, {"q": "¿Qué rendimiento tiene?", "a": "~15 fps con stream 1920×1080 reducido a 640×360 e inferencia cada 5 frames."}, {"q": "¿Qué cámara funciona?", "a": "La cámara IP fue validada; la Brio USB quedó sin probar por falta de hub PD."}, {"q": "¿Cuáles son los límites?", "a": "Es una versión inicial, con sesgo de dataset y edad aproximada; no usar para decisiones sensibles."}]};</script>
+<script src="assets/community.js?v=5" defer></script>
 </body>
 </html>
