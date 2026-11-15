@@ -1118,6 +1118,57 @@ La lista completa —con el motivo de cada enlace— está en [`docs/REFERENCES.
 
 ---
 
+## Ficha de evaluación
+
+**Madurez global: 4.2/5**
+
+| Criterio | Nota | Evidencia |
+|---|---:|---|
+| Madurez | 4/5 | Desplegada como servicio unoq-app y con auditoría estática aprobada en ciclo 2; solo se validó cámara IP Webcam y la Brio USB quedó pendiente. |
+| Reproducibilidad | 4/5 | setup_board.sh idempotente, SHA256 del ONNX y self-test 9/9; el asset vive en un release y las mediciones de FPS son parciales. |
+| Documentación | 5/5 | README de 1152 líneas más datasheet, developer y bitácora con 12 problemas y 11 enfoques descartados. |
+| Honestidad de límites | 5/5 | Separa medido de estimado y declara sin medir la Brio, 2-3 clientes MJPEG, latencia extremo a extremo y temperatura sostenida. |
+| Valor demostrativo | 4/5 | Muestra FastAPI, OpenCV DNN y MJPEG en ARM64 sin GPU, con ~15 fps de UI sobre IP Webcam 1080p reducida a 640×360. |
+| Facilidad de despliegue | 3/5 | Exige venv, dependencias, modelos de ~88 MB o 9,8 MB y ADB/SSH; para USB hace falta un hub USB-C con PD que no estaba disponible. |
+
+Sirve a quien quiera ver un pipeline de visión clásica completo y honesto sobre la UNO Q, con código y documentación reutilizables. La limitación que más pesa es que solo se validó una cámara IP y que las métricas del modelo no se tradujeron a una evaluación en escena real.
+
+## Lo que no funcionó
+
+### Etapa 3 · modelo — ONNX ausente al inicio
+
+El backend utkface_onnx requería un modelo excluido de Git y la app arrancaba sin él. Se entrenó MobileNetV2 con UTKFace, se publicó el asset v1.0.0 con SHA256 y se mantuvo la cadena ONNX → Caffe → modo degradado para que la detección siguiera funcionando.
+
+### Etapa 2 · contrato de modelo — Buckets de edad mezclados entre backends
+
+Reutilizar AGE_BUCKETS para Caffe habría reetiquetado 25-32 como 30-39 sin fallar. Se separó CAFFE_AGE_BUCKETS como constante propia y se documentó que los buckets son parte del contrato del modelo, no configuración global.
+
+### Etapa 2 · hilos — Workers de video que morían o revivían
+
+Una excepción no capturada mataba el hilo, un start/stop rápido reutilizaba el Event de parada y un hilo viejo podía liberar el VideoCapture nuevo. Se encapsuló cada iteración en try/except, se crean Events por ejecución y solo stop() libera la cámara.
+
+### Etapa 6 · endurecimiento — Snapshots sin autenticación ni confinamiento
+
+Cualquiera en la LAN podía guardar JPG de rostros y SNAP_FOLDER=../../.. escribía fuera del proyecto. Se agregaron token opcional, rate-limit atómico de 2 s, carpeta deshabilitada por defecto y revalidación de ruta en cada captura.
+
+## Preguntas típicas
+
+**¿Qué hace exactamente?**
+
+Detecta rostros frontales y muestra una etiqueta de género binario y rango de edad sobre un stream MJPEG servido desde la placa. La UI informa rostros, FPS, backend y estado de cámara en el puerto 8000.
+
+**¿Reconoce personas o mide la edad exacta?**
+
+No. No calcula embeddings de identidad ni compara contra una base de datos, y la edad es un bucket de ocho clases, no una medición exacta. El propio README advierte que no sirve para control de acceso ni decisiones automatizadas.
+
+**¿Cómo se instala y se ejecuta?**
+
+Se crea un venv, se instala requirements.txt, se copia .env.example a .env y se descargan los modelos con los scripts. En la placa se ejecuta con python -m app.main o se despliega con scripts/deploy_unoq.sh y el servicio systemd unoq-app.
+
+**¿Qué se puede reutilizar?**
+
+El hilo de cámara con reconexión, el patrón de un productor MJPEG y muchos lectores, el cargador de modelos con fallback y la validación de configuración. También el parser de nombres UTKFace y su self-test para otros entrenamientos.
+
 ## Licencia
 
 El código de este proyecto se distribuye bajo la **licencia MIT**. El texto completo está en [`LICENSE`](LICENSE):

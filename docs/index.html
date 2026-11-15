@@ -1,24 +1,25 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>Rostros, edad y género. Todo en la placa. · AnalizadorRostro v1</title>
-<meta name="description" content="Analizador de rostros, edad y género sobre Arduino UNO Q v1: YuNet, tracker IoU, ONNX UTKFace, stream MJPEG y UI local en español.">
-<meta name="author" content="wanderc137">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Rostros, edad y género. Todo en la placa. · AnalizadorRostro v1">
-<meta property="og:description" content="Analizador de rostros, edad y género sobre Arduino UNO Q v1: YuNet, tracker IoU, ONNX UTKFace, stream MJPEG y UI local en español.">
-<meta property="og:url" content="https://wanderc137.github.io/AnalizadorRostroUNOQ/">
-<meta property="og:image" content="https://wanderc137.github.io/AnalizadorRostroUNOQ/assets/og.png">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Rostros, edad y género. Todo en la placa. · AnalizadorRostro v1">
-<meta name="twitter:description" content="Analizador de rostros, edad y género sobre Arduino UNO Q v1: YuNet, tracker IoU, ONNX UTKFace, stream MJPEG y UI local en español.">
-<meta name="twitter:image" content="https://wanderc137.github.io/AnalizadorRostroUNOQ/assets/og.png">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2305070c'/><rect x='22' y='22' width='56' height='56' rx='12' fill='none' stroke='%2322D3EE' stroke-width='7'/><circle cx='50' cy='50' r='9' fill='%2322D3EE'/></svg>">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<meta content="Analizador de rostros, edad y género sobre Arduino UNO Q v1: YuNet, tracker IoU, ONNX UTKFace, stream MJPEG y UI local en español." name="description"/>
+<meta content="wanderc137" name="author"/>
+<meta content="website" property="og:type"/>
+<meta content="Rostros, edad y género. Todo en la placa. · AnalizadorRostro v1" property="og:title"/>
+<meta content="Analizador de rostros, edad y género sobre Arduino UNO Q v1: YuNet, tracker IoU, ONNX UTKFace, stream MJPEG y UI local en español." property="og:description"/>
+<meta content="https://wanderc137.github.io/AnalizadorRostroUNOQ/" property="og:url"/>
+<meta content="https://wanderc137.github.io/AnalizadorRostroUNOQ/assets/og.png" property="og:image"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Rostros, edad y género. Todo en la placa. · AnalizadorRostro v1" name="twitter:title"/>
+<meta content="Analizador de rostros, edad y género sobre Arduino UNO Q v1: YuNet, tracker IoU, ONNX UTKFace, stream MJPEG y UI local en español." name="twitter:description"/>
+<meta content="https://wanderc137.github.io/AnalizadorRostroUNOQ/assets/og.png" name="twitter:image"/>
+<link href="data:image/svg+xml,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;rect width='100' height='100' rx='22' fill='%2305070c'/&gt;&lt;rect x='22' y='22' width='56' height='56' rx='12' fill='none' stroke='%2322D3EE' stroke-width='7'/&gt;&lt;circle cx='50' cy='50' r='9' fill='%2322D3EE'/&gt;&lt;/svg&gt;" rel="icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;scrollbar-width:none}
@@ -257,184 +258,203 @@ footer{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.08);pa
   .foot-grid{grid-template-columns:1fr}
   .section{padding:72px 0}
 }
+
+.fail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:6px}
+.fail{background:rgba(10,18,24,.55);border:1px solid var(--line);border-radius:14px;padding:18px}
+.fail .v{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.fail h3{font-size:16px;margin:8px 0 6px}
+.fail p{font-size:14px;margin:0;color:var(--muted)}
+.rating-head{display:flex;align-items:center;gap:20px;margin:6px 0 18px;padding:18px 20px;border:1px solid var(--line);border-radius:16px;background:rgba(10,18,24,.5)}
+.rating-avg{font-family:var(--mono);font-size:40px;line-height:1;color:var(--accent)}
+.rating-avg small{font-size:14px;color:var(--muted)}
+.rating-head p{margin:4px 0 0;font-size:14px;color:var(--muted);max-width:70ch}
+.rating{display:grid;gap:2px}
+.rating-row{display:grid;grid-template-columns:165px minmax(90px,1fr) 48px;gap:14px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.rating-row:last-child{border-bottom:0}
+.rating-name{font-size:13.5px;color:var(--text)}
+.rating-bar{height:6px;border-radius:99px;background:rgba(148,190,200,.14);overflow:hidden}
+.rating-bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.rating-score{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+.rating-note{grid-column:1/-1;font-size:12.5px;color:var(--muted);margin:-4px 0 8px}
+.faq{display:grid;gap:10px;margin-top:4px}
+.faq details{border:1px solid var(--line);border-radius:14px;padding:14px 18px;background:rgba(10,18,24,.4)}
+.faq summary{cursor:pointer;font-weight:600;font-size:14.5px;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";float:right;color:var(--accent);font-family:var(--mono)}
+.faq details[open] summary::after{content:"−"}
+.faq p{margin:10px 0 0;font-size:14px;color:var(--muted);line-height:1.7}
+.concept-grid{display:grid;grid-template-columns:1.35fr .65fr;gap:26px;align-items:start}
+.concept-grid p{font-size:15.5px;color:var(--muted);line-height:1.8;margin:0 0 14px}
+.concept-side{border-left:1px solid var(--line);padding-left:22px}
+.concept-side .k{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.concept-side p{font-size:13px;margin:6px 0 16px}
+@media(max-width:760px){.concept-grid,.fail-grid{grid-template-columns:1fr}.concept-side{border-left:0;padding-left:0}}
+
 </style>
-<link rel="stylesheet" href="assets/community.css?v=5"></head>
+<link href="assets/community.css?v=5" rel="stylesheet"/></head>
 <body style="--accent:#22D3EE;--accent2:#E879F9">
 <div class="grid-overlay"></div>
 <div class="glow one"></div>
 <div class="glow two"></div>
-
 <header class="nav">
-  <div class="wrap nav-inner">
-    <a class="brand" href="#top">
-      <span class="brand-mark"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="3"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/><circle cx="12" cy="12" r="2.5"/></svg></span>
-      <span>AnalizadorRostro v1<small>Portfolio · IA &amp; APIs</small></span>
-    </a>
-    <nav class="nav-links" aria-label="Navegación">
-      <a href="#problema">Visión</a>
-      <a href="#como">Cómo funciona</a>
-      <a href="#arquitectura">Arquitectura</a>
-      <a href="#docs">Documentación</a>
-      <a href="#comunidad">Comunidad</a>
-      <a class="btn btn-ghost" style="padding:9px 15px" href="https://github.com/wanderc137/AnalizadorRostroUNOQ" target="_blank" rel="noopener">GitHub</a>
-    </nav>
-  </div>
+<div class="wrap nav-inner">
+<a class="brand" href="#top">
+<span class="brand-mark"><svg viewbox="0 0 24 24"><rect height="14" rx="3" width="14" x="5" y="5"></rect><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"></path><circle cx="12" cy="12" r="2.5"></circle></svg></span>
+<span>AnalizadorRostro v1<small>Portfolio · IA &amp; APIs</small></span>
+</a>
+<nav aria-label="Navegación" class="nav-links">
+<a href="#problema">Visión</a>
+<a href="#como">Cómo funciona</a>
+<a href="#arquitectura">Arquitectura</a>
+<a href="#docs">Documentación</a>
+<a href="#comunidad">Comunidad</a>
+<a class="btn btn-ghost" href="https://github.com/wanderc137/AnalizadorRostroUNOQ" rel="noopener" style="padding:9px 15px" target="_blank">GitHub</a>
+</nav>
+</div>
 </header>
-
 <main id="top">
 <section class="hero">
-  <div class="wrap hero-grid">
-    <div class="hero-copy">
-      <div class="eyebrow">ARDUINO UNO Q · VISIÓN ARTIFICIAL · V1</div>
-      <h1>Rostros, edad y género.<br><span class='grad'>Todo en la placa.</span></h1>
-      <p class="lead">La primera versión del analizador: YuNet, tracker IoU y clasificación ONNX sobre Arduino UNO Q, con stream MJPEG y una UI en español.</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="https://github.com/wanderc137/AnalizadorRostroUNOQ" target="_blank" rel="noopener">Ver el repositorio <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-        <a class="btn btn-ghost" href="https://github.com/wanderc137/AnalizadorRostroUNOQ#readme" target="_blank" rel="noopener">Leer la documentación</a>
-      </div>
-      <div class="hero-badges"><span class="badge">Python</span><span class="badge">FastAPI</span><span class="badge">OpenCV YuNet</span><span class="badge">ONNX</span><span class="badge">UTKFace</span><span class="badge">MIT</span></div>
-    </div>
-    <div class="hero-visual">
-      <div class="visual-frame"><img src="assets/pipeline.svg" alt="Pipeline de detección, tracker y clasificación"></div>
-      <div class="visual-caption">docs/assets/pipeline.svg · detección, IoU y clasificación</div>
-      <div class="float-chip"><span class="live-dot"></span>&lt;span&gt;~15 fps&lt;/span&gt; con IP Webcam</div>
-    </div>
-  </div>
+<div class="wrap hero-grid">
+<div class="hero-copy">
+<div class="eyebrow">ARDUINO UNO Q · VISIÓN ARTIFICIAL · V1</div>
+<h1>Rostros, edad y género.<br/><span class="grad">Todo en la placa.</span></h1>
+<p class="lead">La primera versión del analizador: YuNet, tracker IoU y clasificación ONNX sobre Arduino UNO Q, con stream MJPEG y una UI en español.</p>
+<div class="hero-actions">
+<a class="btn btn-primary" href="https://github.com/wanderc137/AnalizadorRostroUNOQ" rel="noopener" target="_blank">Ver el repositorio <svg viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a class="btn btn-ghost" href="https://github.com/wanderc137/AnalizadorRostroUNOQ#readme" rel="noopener" target="_blank">Leer la documentación</a>
+</div>
+<div class="hero-badges"><span class="badge">Python</span><span class="badge">FastAPI</span><span class="badge">OpenCV YuNet</span><span class="badge">ONNX</span><span class="badge">UTKFace</span><span class="badge">MIT</span></div>
+</div>
+<div class="hero-visual">
+<div class="visual-frame"><img alt="Pipeline de detección, tracker y clasificación" src="assets/pipeline.svg"/></div>
+<div class="visual-caption">docs/assets/pipeline.svg · detección, IoU y clasificación</div>
+<div class="float-chip"><span class="live-dot"></span>&lt;span&gt;~15 fps&lt;/span&gt; con IP Webcam</div>
+</div>
+</div>
 </section>
-
-<section class="stats"><div class="wrap stats-grid"><div class="stat"><div class="stat-value">84,56 %</div><div class="stat-label">género en test</div></div><div class="stat"><div class="stat-value">48,17 %</div><div class="stat-label">edad exacta</div></div><div class="stat"><div class="stat-value">83,8 %</div><div class="stat-label">edad ±1 bucket</div></div><div class="stat"><div class="stat-value">~15 fps</div><div class="stat-label">UI con IP Webcam</div></div></div></section>
-
+<section class="stats"><div class="wrap stats-grid"><div class="stat"><div class="stat-value">84,56 %</div><div class="stat-label">género en test</div></div><div class="stat"><div class="stat-value">48,17 %</div><div class="stat-label">edad exacta</div></div><div class="stat"><div class="stat-value">83,8 %</div><div class="stat-label">edad ±1 bucket</div></div><div class="stat"><div class="stat-value">~15 fps</div><div class="stat-label">UI con IP Webcam</div></div></div></section><section class="section" id="concepto"><div class="wrap"><div class="section-head"><div class="kicker">El concepto</div><h2>Qué es y por qué existe</h2><p class="section-sub">El problema, el enfoque y el alcance real del proyecto.</p></div><div class="concept-grid"><div><p>App Python/FastAPI en el MPU Linux (QRB2210, ARM64, Debian) de la UNO Q. Captura video de cámara IP/MJPEG o USB UVC, detecta rostros frontales con Haar y estima género binario y edad en ocho buckets con un ONNX propio entrenado con UTKFace o el Caffe de Levi & Hassner. Sirve el video anotado como MJPEG en el puerto 8000, con UI en español y snapshots off. Apunta a demostraciones y docencia: visión clásica en ARM64 sin GPU ni nube.</p><p>Demuestra que el MPU sostiene la app con un productor de video y varios navegadores consumiendo el mismo JPEG, sin multiplicar la inferencia. No identifica personas, no mide edad exacta y no ejecuta nada en el MCU STM32U585; tampoco tiene tracking, anti-spoofing ni grabación. Las métricas (género 84,56 %, edad exacta 48,17 %, ±1 bucket 83,8 %) son de UTKFace, no de cámara real; solo se validó IP Webcam a ~15 fps y la Brio USB quedó sin probar.</p></div><div class="concept-side"><div class="k">Cómo leer esta ficha</div><p>Los tropiezos salen de la bitácora y de las versiones tempranas. La evaluación usa seis criterios fijos, de 1 a 5, y no premia la espectacularidad: premia que el proyecto se pueda reproducir y entender.</p></div></div></div></section>
 <section class="section" id="problema">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div class="kicker">01 — La idea</div>
-      <h2>Visión artificial sin GPU y sin nube</h2>
-      <p class="section-sub">La v1 lleva detección y clasificación al QRB2210 y sirve el resultado como MJPEG dentro de la LAN. Es la base sobre la que se construyó la v2.</p>
-    </div>
-    <div class="split">
-      <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z"/><path d="M12 9v5M12 17v.01"/></svg></div><h3>La visión que se va de la red</h3><p>Enviar cada frame a un servicio externo plantea privacidad, costo y latencia. Para un local, un evento o un prototipo, esa dependencia es difícil de justificar.</p></div>
-      <div class="card reveal"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/></svg></div><h3>Inferencia edge, video local</h3><p>YuNet + tracker IoU + clasificador ONNX en la placa. El video se queda en la LAN y se sirve como stream MJPEG a cualquier navegador.</p></div>
-    </div>
-  </div>
+<div class="wrap">
+<div class="section-head reveal">
+<div class="kicker">01 — La idea</div>
+<h2>Visión artificial sin GPU y sin nube</h2>
+<p class="section-sub">La v1 lleva detección y clasificación al QRB2210 y sirve el resultado como MJPEG dentro de la LAN. Es la base sobre la que se construyó la v2.</p>
+</div>
+<div class="split">
+<div class="card reveal"><div class="icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3Z"></path><path d="M12 9v5M12 17v.01"></path></svg></div><h3>La visión que se va de la red</h3><p>Enviar cada frame a un servicio externo plantea privacidad, costo y latencia. Para un local, un evento o un prototipo, esa dependencia es difícil de justificar.</p></div>
+<div class="card reveal"><div class="icon"><svg aria-hidden="true" viewbox="0 0 24 24"><rect height="12" rx="2" width="12" x="6" y="6"></rect><path d="M9 1v3M15 1v3M9 20v3M15 20v3M1 9h3M1 15h3M20 9h3M20 15h3"></path><rect height="5" rx="1" width="5" x="9.5" y="9.5"></rect></svg></div><h3>Inferencia edge, video local</h3><p>YuNet + tracker IoU + clasificador ONNX en la placa. El video se queda en la LAN y se sirve como stream MJPEG a cualquier navegador.</p></div>
+</div>
+</div>
 </section>
-
 <section class="section tight" id="como">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div class="kicker">02 — El recorrido</div>
-      <h2>Cómo funciona, paso a paso</h2>
-      <p class="section-sub">Detección y clasificación separadas para gastar CPU solo cuando hace falta.</p>
-    </div>
-    <div class="timeline reveal"><div class="step"><div class="step-num">01</div><div class="step-body"><h3>Captura</h3><p>Cámara IP MJPEG por WiFi o Brio USB, con resolución reducida para el pipeline.</p></div></div><div class="step"><div class="step-num">02</div><div class="step-body"><h3>Detección</h3><p>YuNet a 320 px cada N frames, con fallback Haar si falta el modelo.</p></div></div><div class="step"><div class="step-num">03</div><div class="step-body"><h3>Tracker IoU</h3><p>Conserva la última predicción y evita el parpadeo de etiquetas entre frames.</p></div></div><div class="step"><div class="step-num">04</div><div class="step-body"><h3>Clasificación</h3><p>ONNX UTKFace o Caffe Levi & Hassner, en ciclos separados de la detección.</p></div></div><div class="step"><div class="step-num">05</div><div class="step-body"><h3>Anotación y stream</h3><p>Cajas, etiquetas y HUD sobre MJPEG para cualquier navegador de la red.</p></div></div></div>
-  </div>
+<div class="wrap">
+<div class="section-head reveal">
+<div class="kicker">02 — El recorrido</div>
+<h2>Cómo funciona, paso a paso</h2>
+<p class="section-sub">Detección y clasificación separadas para gastar CPU solo cuando hace falta.</p>
+</div>
+<div class="timeline reveal"><div class="step"><div class="step-num">01</div><div class="step-body"><h3>Captura</h3><p>Cámara IP MJPEG por WiFi o Brio USB, con resolución reducida para el pipeline.</p></div></div><div class="step"><div class="step-num">02</div><div class="step-body"><h3>Detección</h3><p>YuNet a 320 px cada N frames, con fallback Haar si falta el modelo.</p></div></div><div class="step"><div class="step-num">03</div><div class="step-body"><h3>Tracker IoU</h3><p>Conserva la última predicción y evita el parpadeo de etiquetas entre frames.</p></div></div><div class="step"><div class="step-num">04</div><div class="step-body"><h3>Clasificación</h3><p>ONNX UTKFace o Caffe Levi &amp; Hassner, en ciclos separados de la detección.</p></div></div><div class="step"><div class="step-num">05</div><div class="step-body"><h3>Anotación y stream</h3><p>Cajas, etiquetas y HUD sobre MJPEG para cualquier navegador de la red.</p></div></div></div>
+</div>
 </section>
-
 <section class="section tight" id="arquitectura">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div class="kicker">03 — Bajo el capó</div>
-      <h2>Un pipeline con dos cadencias</h2>
-      <p class="section-sub">Detectar es caro; clasificar también. Separar los ciclos y reutilizar tracks es lo que permite mantener la UI fluida en CPU.</p>
-    </div>
-    <figure class="figure reveal"><img src="assets/pipeline.svg" alt="Pipeline de detección, tracker y clasificación" loading="lazy"><figcaption>docs/assets/pipeline.svg · detección, IoU y clasificación</figcaption></figure>
-    <div class="arch-points reveal"><div class="card"><h4>YuNet primero</h4><p>Detección frontal rápida y liviana, con Haar como red de seguridad.</p></div><div class="card"><h4>Tracker con memoria</h4><p>Un track desaparecido se conserva hasta dos frames para no perder la etiqueta.</p></div><div class="card"><h4>Modo reposo</h4><p>Sin clientes MJPEG no hay inferencia ni JPEG: la CPU queda casi libre.</p></div></div>
-  </div>
+<div class="wrap">
+<div class="section-head reveal">
+<div class="kicker">03 — Bajo el capó</div>
+<h2>Un pipeline con dos cadencias</h2>
+<p class="section-sub">Detectar es caro; clasificar también. Separar los ciclos y reutilizar tracks es lo que permite mantener la UI fluida en CPU.</p>
+</div>
+<figure class="figure reveal"><img alt="Pipeline de detección, tracker y clasificación" loading="lazy" src="assets/pipeline.svg"/><figcaption>docs/assets/pipeline.svg · detección, IoU y clasificación</figcaption></figure>
+<div class="arch-points reveal"><div class="card"><h4>YuNet primero</h4><p>Detección frontal rápida y liviana, con Haar como red de seguridad.</p></div><div class="card"><h4>Tracker con memoria</h4><p>Un track desaparecido se conserva hasta dos frames para no perder la etiqueta.</p></div><div class="card"><h4>Modo reposo</h4><p>Sin clientes MJPEG no hay inferencia ni JPEG: la CPU queda casi libre.</p></div></div>
+</div>
 </section>
-
 <section class="section tight">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div class="kicker">04 — Lo que lo hace distinto</div>
-      <h2>Decisiones de ingeniería</h2>
-      <p class="section-sub">La versión que abrió el camino: dataset, entrenamiento, runtime, UI y despliegue.</p>
-    </div>
-    <div class="features reveal"><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 10h.01M15 10h.01M8.5 15a4.5 4.5 0 0 0 7 0"/></svg></div><h3>YuNet + Haar</h3><p>Detección frontal con score 0.6 y NMS 0.3, y fallback clásico si falta el modelo.</p></div><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></div><h3>Tracker IoU</h3><p>Empareja detecciones con tracks y conserva predicciones para estabilizar la UI.</p></div><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-1 5.8V16a3 3 0 0 0 3 3h1a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3Z"/><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 1 5.8V16a3 3 0 0 1-3 3h-1a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z"/><path d="M12 4v16"/></svg></div><h3>Dos backends</h3><p>ONNX propio entrenado con UTKFace o Caffe de Levi & Hassner; `auto` prefiere el ONNX.</p></div><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="m7 15 3-4 3 2 4-6"/></svg></div><h3>Entrenamiento incluido</h3><p>Pipeline UTKFace con métricas de test: género 84,56 %, edad exacta 48,17 %, ±1 bucket 83,8 %.</p></div><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v11H3V8a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="4"/></svg></div><h3>MJPEG multi-cliente</h3><p>Stream para varios navegadores y snapshots, sin plugins en el cliente.</p></div><div class="feature"><div class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m9 12 2 2 4-4"/></svg></div><h3>Privacidad por diseño</h3><p>Sin envío de frames a Internet; advertencias sobre datos biométricos y consentimiento.</p></div></div>
-  </div>
+<div class="wrap">
+<div class="section-head reveal">
+<div class="kicker">04 — Lo que lo hace distinto</div>
+<h2>Decisiones de ingeniería</h2>
+<p class="section-sub">La versión que abrió el camino: dataset, entrenamiento, runtime, UI y despliegue.</p>
+</div>
+<div class="features reveal"><div class="feature"><div class="icon"><svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M9 10h.01M15 10h.01M8.5 15a4.5 4.5 0 0 0 7 0"></path></svg></div><h3>YuNet + Haar</h3><p>Detección frontal con score 0.6 y NMS 0.3, y fallback clásico si falta el modelo.</p></div><div class="feature"><div class="icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M17 2l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 22l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg></div><h3>Tracker IoU</h3><p>Empareja detecciones con tracks y conserva predicciones para estabilizar la UI.</p></div><div class="feature"><div class="icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M9 4a3 3 0 0 0-3 3v1a3 3 0 0 0-1 5.8V16a3 3 0 0 0 3 3h1a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3Z"></path><path d="M15 4a3 3 0 0 1 3 3v1a3 3 0 0 1 1 5.8V16a3 3 0 0 1-3 3h-1a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z"></path><path d="M12 4v16"></path></svg></div><h3>Dos backends</h3><p>ONNX propio entrenado con UTKFace o Caffe de Levi &amp; Hassner; `auto` prefiere el ONNX.</p></div><div class="feature"><div class="icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M3 3v18h18"></path><path d="m7 15 3-4 3 2 4-6"></path></svg></div><h3>Entrenamiento incluido</h3><p>Pipeline UTKFace con métricas de test: género 84,56 %, edad exacta 48,17 %, ±1 bucket 83,8 %.</p></div><div class="feature"><div class="icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M4 7h3l1.5-2h7L17 7h3a1 1 0 0 1 1 1v11H3V8a1 1 0 0 1 1-1Z"></path><circle cx="12" cy="13" r="4"></circle></svg></div><h3>MJPEG multi-cliente</h3><p>Stream para varios navegadores y snapshots, sin plugins en el cliente.</p></div><div class="feature"><div class="icon"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"></path><path d="m9 12 2 2 4-4"></path></svg></div><h3>Privacidad por diseño</h3><p>Sin envío de frames a Internet; advertencias sobre datos biométricos y consentimiento.</p></div></div>
+</div>
 </section>
-
-<section class="section tight"><div class="wrap"><div class="section-head reveal"><div class="kicker">05 — Diagramas</div><h2>El sistema, en dibujos</h2><p class="section-sub">Los diagramas se mantienen en el repositorio y se actualizan con el código.</p></div><div class="gallery"><figure class="figure"><img src="assets/architecture.svg" alt="AnalizadorRostro v1 — architecture" loading="lazy"><figcaption>Architecture</figcaption></figure><figure class="figure"><img src="assets/deployment.svg" alt="AnalizadorRostro v1 — deployment" loading="lazy"><figcaption>Deployment</figcaption></figure><figure class="figure"><img src="assets/models.svg" alt="AnalizadorRostro v1 — models" loading="lazy"><figcaption>Models</figcaption></figure></div></div></section>
-
+<section class="section tight"><div class="wrap"><div class="section-head reveal"><div class="kicker">05 — Diagramas</div><h2>El sistema, en dibujos</h2><p class="section-sub">Los diagramas se mantienen en el repositorio y se actualizan con el código.</p></div><div class="gallery"><figure class="figure"><img alt="AnalizadorRostro v1 — architecture" loading="lazy" src="assets/architecture.svg"/><figcaption>Architecture</figcaption></figure><figure class="figure"><img alt="AnalizadorRostro v1 — deployment" loading="lazy" src="assets/deployment.svg"/><figcaption>Deployment</figcaption></figure><figure class="figure"><img alt="AnalizadorRostro v1 — models" loading="lazy" src="assets/models.svg"/><figcaption>Models</figcaption></figure></div></div></section>
 <section class="section tight">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div class="kicker">06 — Stack y arranque</div>
-      <h2>Con qué está construido</h2>
-      <p class="section-sub">OpenCV, ONNX Runtime y FastAPI sobre el Linux de la UNO Q; PyTorch solo para entrenar.</p>
-    </div>
-    <div class="stack-grid">
-      <div class="reveal">
-        <div class="chips"><span class="chip">Python</span><span class="chip">FastAPI</span><span class="chip">OpenCV</span><span class="chip">YuNet</span><span class="chip">ONNX Runtime</span><span class="chip">PyTorch</span><span class="chip">UTKFace</span><span class="chip">Caffe</span><span class="chip">MJPEG</span><span class="chip">Debian</span><span class="chip">QRB2210</span><span class="chip">IP Webcam</span></div>
-        <div class="note"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"/><path d="m9 12 2 2 4-4"/></svg><span>No identifica personas: detecta rostros y estima atributos. Usalo con consentimiento, aviso claro y sin almacenar snapshots sin autorización.</span></div>
-      </div>
-      <div class="terminal reveal">
-        <div class="terminal-bar"><i></i><i></i><i></i><span>arrancar la v1</span></div>
-        <pre><span class="p">$</span> git clone https://github.com/wanderc137/AnalizadorRostroUNOQ
+<div class="wrap">
+<div class="section-head reveal">
+<div class="kicker">06 — Stack y arranque</div>
+<h2>Con qué está construido</h2>
+<p class="section-sub">OpenCV, ONNX Runtime y FastAPI sobre el Linux de la UNO Q; PyTorch solo para entrenar.</p>
+</div>
+<div class="stack-grid">
+<div class="reveal">
+<div class="chips"><span class="chip">Python</span><span class="chip">FastAPI</span><span class="chip">OpenCV</span><span class="chip">YuNet</span><span class="chip">ONNX Runtime</span><span class="chip">PyTorch</span><span class="chip">UTKFace</span><span class="chip">Caffe</span><span class="chip">MJPEG</span><span class="chip">Debian</span><span class="chip">QRB2210</span><span class="chip">IP Webcam</span></div>
+<div class="note"><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6L12 3Z"></path><path d="m9 12 2 2 4-4"></path></svg><span>No identifica personas: detecta rostros y estima atributos. Usalo con consentimiento, aviso claro y sin almacenar snapshots sin autorización.</span></div>
+</div>
+<div class="terminal reveal">
+<div class="terminal-bar"><i></i><i></i><i></i><span>arrancar la v1</span></div>
+<pre><span class="p">$</span> git clone https://github.com/wanderc137/AnalizadorRostroUNOQ
 <span class="p">$</span> cd AnalizadorRostroUNOQ
-<span class="p">$</span> python3 -m venv .venv && source .venv/bin/activate
+<span class="p">$</span> python3 -m venv .venv &amp;&amp; source .venv/bin/activate
 <span class="p">$</span> pip install -r requirements.txt
 <span class="p">$</span> ./scripts/download_model.sh
 <span class="p">$</span> python -m app.main
 <span class="c"># UI → http://&lt;IP_UNO_Q&gt;:8000/</span></pre>
-      </div>
-    </div>
-  </div>
+</div>
+</div>
+</div>
 </section>
-
 <section class="section tight" id="docs">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <div class="kicker">07 — Documentación</div>
-      <h2>Todo está escrito</h2>
-      <p class="section-sub">Cada decisión, cada límite y cada comando están documentados en el repositorio. Sin folletos: lo que funciona se muestra, lo que no, también.</p>
-    </div>
-    <div class="docs-grid reveal"><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/datasheet.md" target="_blank" rel="noopener"><span class="tag">Manual</span><h3>Datasheet</h3><p>Instalación, operación, configuración, API y privacidad.</p><span class="arrow">Abrir documento <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/developer.md" target="_blank" rel="noopener"><span class="tag">Código</span><h3>Guía de desarrollador</h3><p>Módulos, hilos, frontend, entrenamiento y extensión.</p><span class="arrow">Abrir documento <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/BITACORA.md" target="_blank" rel="noopener"><span class="tag">Historia</span><h3>Bitácora</h3><p>Decisiones, pruebas y evolución de la v1.</p><span class="arrow">Abrir documento <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/REFERENCES.md" target="_blank" rel="noopener"><span class="tag">Fuentes</span><h3>Referencias</h3><p>YuNet, UTKFace, ONNX, FastAPI y MJPEG.</p><span class="arrow">Abrir documento <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a></div>
-  </div>
+<div class="wrap">
+<div class="section-head reveal">
+<div class="kicker">07 — Documentación</div>
+<h2>Todo está escrito</h2>
+<p class="section-sub">Cada decisión, cada límite y cada comando están documentados en el repositorio. Sin folletos: lo que funciona se muestra, lo que no, también.</p>
+</div>
+<div class="docs-grid reveal"><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/datasheet.md" rel="noopener" target="_blank"><span class="tag">Manual</span><h3>Datasheet</h3><p>Instalación, operación, configuración, API y privacidad.</p><span class="arrow">Abrir documento <svg viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/developer.md" rel="noopener" target="_blank"><span class="tag">Código</span><h3>Guía de desarrollador</h3><p>Módulos, hilos, frontend, entrenamiento y extensión.</p><span class="arrow">Abrir documento <svg viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/BITACORA.md" rel="noopener" target="_blank"><span class="tag">Historia</span><h3>Bitácora</h3><p>Decisiones, pruebas y evolución de la v1.</p><span class="arrow">Abrir documento <svg viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a><a class="doc-card" href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/REFERENCES.md" rel="noopener" target="_blank"><span class="tag">Fuentes</span><h3>Referencias</h3><p>YuNet, UTKFace, ONNX, FastAPI y MJPEG.</p><span class="arrow">Abrir documento <svg viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a></div>
+</div>
 </section>
-
-<section class="cta">
-  <div class="wrap">
-    <div class="cta-card reveal">
-      <div class="kicker" style="justify-content:center">Portfolio · 21 proyectos</div>
-      <h2>¿Te animás?</h2>
-      <p>Usá esto como base y referencia para entender la primera versión del analizador y usarla como base para visión en el borde. Este proyecto es la prueba de que se puede hacer con componentes reales.</p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" href="https://wanderc137.github.io/" target="_blank" rel="noopener">Ver todos los proyectos <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-        <a class="btn btn-ghost" href="https://github.com/wanderc137/AnalizadorRostroUNOQ" target="_blank" rel="noopener">Explorar el código</a>
-      </div>
-    </div>
-  </div>
+<section class="section tight"><div class="wrap"><div class="section-head"><div class="kicker">Tropiezos</div><h2>Los tropiezos, documentados</h2><p class="section-sub">Lo que no funcionó en las primeras versiones, con la corrección aplicada.</p></div><div class="fail-grid"><div class="fail"><div class="v">Etapa 3 · modelo</div><h3>ONNX ausente al inicio</h3><p>El backend utkface_onnx requería un modelo excluido de Git y la app arrancaba sin él. Se entrenó MobileNetV2 con UTKFace, se publicó el asset v1.0.0 con SHA256 y se mantuvo la cadena ONNX → Caffe → modo degradado para que la detección siguiera funcionando.</p></div><div class="fail"><div class="v">Etapa 2 · contrato de modelo</div><h3>Buckets de edad mezclados entre backends</h3><p>Reutilizar AGE_BUCKETS para Caffe habría reetiquetado 25-32 como 30-39 sin fallar. Se separó CAFFE_AGE_BUCKETS como constante propia y se documentó que los buckets son parte del contrato del modelo, no configuración global.</p></div><div class="fail"><div class="v">Etapa 2 · hilos</div><h3>Workers de video que morían o revivían</h3><p>Una excepción no capturada mataba el hilo, un start/stop rápido reutilizaba el Event de parada y un hilo viejo podía liberar el VideoCapture nuevo. Se encapsuló cada iteración en try/except, se crean Events por ejecución y solo stop() libera la cámara.</p></div><div class="fail"><div class="v">Etapa 6 · endurecimiento</div><h3>Snapshots sin autenticación ni confinamiento</h3><p>Cualquiera en la LAN podía guardar JPG de rostros y SNAP_FOLDER=../../.. escribía fuera del proyecto. Se agregaron token opcional, rate-limit atómico de 2 s, carpeta deshabilitada por defecto y revalidación de ruta en cada captura.</p></div></div></div></section><section class="section tight"><div class="wrap"><div class="section-head"><div class="kicker">Evaluación</div><h2>Cómo se mide este proyecto</h2><p class="section-sub">Seis criterios fijos, con la evidencia que respalda cada nota.</p></div><div class="rating-head"><div class="rating-avg">4.2<small>/5</small></div><p>Sirve a quien quiera ver un pipeline de visión clásica completo y honesto sobre la UNO Q, con código y documentación reutilizables. La limitación que más pesa es que solo se validó una cámara IP y que las métricas del modelo no se tradujeron a una evaluación en escena real.</p></div><div class="rating"><div class="rating-row"><div class="rating-name">Madurez</div><div class="rating-bar"><span style="width:80%"></span></div><div class="rating-score">4/5</div><div class="rating-note">Desplegada como servicio unoq-app y con auditoría estática aprobada en ciclo 2; solo se validó cámara IP Webcam y la Brio USB quedó pendiente.</div></div><div class="rating-row"><div class="rating-name">Reproducibilidad</div><div class="rating-bar"><span style="width:80%"></span></div><div class="rating-score">4/5</div><div class="rating-note">setup_board.sh idempotente, SHA256 del ONNX y self-test 9/9; el asset vive en un release y las mediciones de FPS son parciales.</div></div><div class="rating-row"><div class="rating-name">Documentación</div><div class="rating-bar"><span style="width:100%"></span></div><div class="rating-score">5/5</div><div class="rating-note">README de 1152 líneas más datasheet, developer y bitácora con 12 problemas y 11 enfoques descartados.</div></div><div class="rating-row"><div class="rating-name">Honestidad de límites</div><div class="rating-bar"><span style="width:100%"></span></div><div class="rating-score">5/5</div><div class="rating-note">Separa medido de estimado y declara sin medir la Brio, 2-3 clientes MJPEG, latencia extremo a extremo y temperatura sostenida.</div></div><div class="rating-row"><div class="rating-name">Valor demostrativo</div><div class="rating-bar"><span style="width:80%"></span></div><div class="rating-score">4/5</div><div class="rating-note">Muestra FastAPI, OpenCV DNN y MJPEG en ARM64 sin GPU, con ~15 fps de UI sobre IP Webcam 1080p reducida a 640×360.</div></div><div class="rating-row"><div class="rating-name">Facilidad de despliegue</div><div class="rating-bar"><span style="width:60%"></span></div><div class="rating-score">3/5</div><div class="rating-note">Exige venv, dependencias, modelos de ~88 MB o 9,8 MB y ADB/SSH; para USB hace falta un hub USB-C con PD que no estaba disponible.</div></div></div></div></section><section class="section tight"><div class="wrap"><div class="section-head"><div class="kicker">Preguntas</div><h2>Lo que suelen preguntar</h2></div><div class="faq"><details><summary>¿Qué hace exactamente?</summary><p>Detecta rostros frontales y muestra una etiqueta de género binario y rango de edad sobre un stream MJPEG servido desde la placa. La UI informa rostros, FPS, backend y estado de cámara en el puerto 8000.</p></details><details><summary>¿Reconoce personas o mide la edad exacta?</summary><p>No. No calcula embeddings de identidad ni compara contra una base de datos, y la edad es un bucket de ocho clases, no una medición exacta. El propio README advierte que no sirve para control de acceso ni decisiones automatizadas.</p></details><details><summary>¿Cómo se instala y se ejecuta?</summary><p>Se crea un venv, se instala requirements.txt, se copia .env.example a .env y se descargan los modelos con los scripts. En la placa se ejecuta con python -m app.main o se despliega con scripts/deploy_unoq.sh y el servicio systemd unoq-app.</p></details><details><summary>¿Qué se puede reutilizar?</summary><p>El hilo de cámara con reconexión, el patrón de un productor MJPEG y muchos lectores, el cargador de modelos con fallback y la validación de configuración. También el parser de nombres UTKFace y su self-test para otros entrenamientos.</p></details></div></div></section><section class="cta">
+<div class="wrap">
+<div class="cta-card reveal">
+<div class="kicker" style="justify-content:center">Portfolio · 21 proyectos</div>
+<h2>¿Te animás?</h2>
+<p>Usá esto como base y referencia para entender la primera versión del analizador y usarla como base para visión en el borde. Este proyecto es la prueba de que se puede hacer con componentes reales.</p>
+<div class="hero-actions">
+<a class="btn btn-primary" href="https://wanderc137.github.io/" rel="noopener" target="_blank">Ver todos los proyectos <svg viewbox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a class="btn btn-ghost" href="https://github.com/wanderc137/AnalizadorRostroUNOQ" rel="noopener" target="_blank">Explorar el código</a>
+</div>
+</div>
+</div>
 </section>
 </main>
-
 <footer>
-  <div class="wrap">
-    <div class="foot-grid">
-      <div>
-        <div class="foot-brand"><span class="brand-mark"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="3"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/><circle cx="12" cy="12" r="2.5"/></svg></span>AnalizadorRostro v1</div>
-        <p class="foot-p">Analizador de rostros, género y edad sobre Arduino UNO Q: YuNet, ONNX, UTKFace y MJPEG 100 % local.</p>
-      </div>
-      <div>
-        <h4>Este proyecto</h4>
-        <div class="foot-links">
-          <a href="https://github.com/wanderc137/AnalizadorRostroUNOQ" target="_blank" rel="noopener">Repositorio en GitHub</a>
-          <a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/README.md" target="_blank" rel="noopener">README técnico</a>
-          <a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/datasheet.md" target="_blank" rel="noopener">Datasheet</a>
-          <a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/BITACORA.md" target="_blank" rel="noopener">Guía de desarrollador</a>
-          <a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/REFERENCES.md" target="_blank" rel="noopener">Referencias</a>
-        </div>
-      </div>
-      <div>
-        <h4>Otros proyectos</h4>
-        <div class="foot-links"><a href="https://wanderc137.github.io/proxy-openrouter-ia-chinas/">OpenRouter Proxy</a><a href="https://wanderc137.github.io/netEspNow-v1.4/">netEspNow</a><a href="https://wanderc137.github.io/nb2700-telemetria/">NB2700 Telemetría</a><a href="https://wanderc137.github.io/mega-free-chat/">Mega Free Chat</a><a href="https://wanderc137.github.io/CubeCell-LoRaWAN-Node-v1.3/">CubeCell LoRaWAN Bridge v1.3</a><a href="https://wanderc137.github.io/CashDroController/">CashDro Controller</a><a href="https://wanderc137.github.io/BusAccel-8266-v4/">BusAccel</a><a href="https://wanderc137.github.io/SpeechToTextAuxPy/">SpeechToText Aux</a><a href="https://wanderc137.github.io/teleAsistenciaV1.3/">Alerta Mayor</a><a href="https://wanderc137.github.io/TotemAutoatencion/">Totem Autoatención</a><a href="https://wanderc137.github.io/turnero/">Turnero</a><a href="https://wanderc137.github.io/valvulas-zigbee/">Válvulas Zigbee</a><a href="https://wanderc137.github.io/mesacerca/">MesaCerca</a><a href="https://wanderc137.github.io/permaweb-app/">Permaweb App</a></div>
-      </div>
-    </div>
-    <div class="foot-bottom">
-      <span><a href="https://wanderc137.github.io/">Portfolio</a> · © 2026 wanderc137 · Licencia MIT</span>
-      <span>Diseñado y construido por wanderc137</span>
-    </div>
-  </div>
+<div class="wrap">
+<div class="foot-grid">
+<div>
+<div class="foot-brand"><span class="brand-mark"><svg viewbox="0 0 24 24"><rect height="14" rx="3" width="14" x="5" y="5"></rect><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"></path><circle cx="12" cy="12" r="2.5"></circle></svg></span>AnalizadorRostro v1</div>
+<p class="foot-p">Analizador de rostros, género y edad sobre Arduino UNO Q: YuNet, ONNX, UTKFace y MJPEG 100 % local.</p>
+</div>
+<div>
+<h4>Este proyecto</h4>
+<div class="foot-links">
+<a href="https://github.com/wanderc137/AnalizadorRostroUNOQ" rel="noopener" target="_blank">Repositorio en GitHub</a>
+<a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/README.md" rel="noopener" target="_blank">README técnico</a>
+<a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/datasheet.md" rel="noopener" target="_blank">Datasheet</a>
+<a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/BITACORA.md" rel="noopener" target="_blank">Guía de desarrollador</a>
+<a href="https://github.com/wanderc137/AnalizadorRostroUNOQ/blob/main/docs/REFERENCES.md" rel="noopener" target="_blank">Referencias</a>
+</div>
+</div>
+<div>
+<h4>Otros proyectos</h4>
+<div class="foot-links"><a href="https://wanderc137.github.io/proxy-openrouter-ia-chinas/">OpenRouter Proxy</a><a href="https://wanderc137.github.io/netEspNow-v1.4/">netEspNow</a><a href="https://wanderc137.github.io/nb2700-telemetria/">NB2700 Telemetría</a><a href="https://wanderc137.github.io/mega-free-chat/">Mega Free Chat</a><a href="https://wanderc137.github.io/CubeCell-LoRaWAN-Node-v1.3/">CubeCell LoRaWAN Bridge v1.3</a><a href="https://wanderc137.github.io/CashDroController/">CashDro Controller</a><a href="https://wanderc137.github.io/BusAccel-8266-v4/">BusAccel</a><a href="https://wanderc137.github.io/SpeechToTextAuxPy/">SpeechToText Aux</a><a href="https://wanderc137.github.io/teleAsistenciaV1.3/">Alerta Mayor</a><a href="https://wanderc137.github.io/TotemAutoatencion/">Totem Autoatención</a><a href="https://wanderc137.github.io/turnero/">Turnero</a><a href="https://wanderc137.github.io/valvulas-zigbee/">Válvulas Zigbee</a><a href="https://wanderc137.github.io/mesacerca/">MesaCerca</a><a href="https://wanderc137.github.io/permaweb-app/">Permaweb App</a></div>
+</div>
+</div>
+<div class="foot-bottom">
+<span><a href="https://wanderc137.github.io/">Portfolio</a> · © 2026 wanderc137 · Licencia MIT</span>
+<span>Diseñado y construido por wanderc137</span>
+</div>
+</div>
 </footer>
-
 <script>
 (function(){
   var io = new IntersectionObserver(function(entries){
@@ -448,8 +468,7 @@ footer{position:relative;z-index:1;border-top:1px solid rgba(255,255,255,.08);pa
   document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
 })();
 </script>
-
 <script>window.PORTFOLIO_COMMUNITY = {"account": "wanderc137", "repo": "AnalizadorRostroUNOQ", "coinNamespace": "wanderc137-analizadorrostrounoq-coins-v1", "faqs": [{"q": "¿Qué diferencia hay con la v2?", "a": "La v1 es la base: Haar/YuNet + ONNX o Caffe, UI en <code>:8000</code>; la v2 refina el pipeline, la documentación y la experiencia."}, {"q": "¿Qué backend usa?", "a": "ONNX UTKFace 224×224 o Caffe Levi & Hassner, seleccionable por configuración."}, {"q": "¿Qué rendimiento tiene?", "a": "~15 fps con stream 1920×1080 reducido a 640×360 e inferencia cada 5 frames."}, {"q": "¿Qué cámara funciona?", "a": "La cámara IP fue validada; la Brio USB quedó sin probar por falta de hub PD."}, {"q": "¿Cuáles son los límites?", "a": "Es una versión inicial, con sesgo de dataset y edad aproximada; no usar para decisiones sensibles."}]};</script>
-<script src="assets/community.js?v=5" defer></script>
+<script defer="" src="assets/community.js?v=5"></script>
 </body>
 </html>
