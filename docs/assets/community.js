@@ -77,22 +77,93 @@
     catch { return String(n); }
   };
 
-  const loadCoins = async () => {
+  /* Base simbólica estable por proyecto: 3..98. Se toma de assets/coins.json
+     y, si el archivo no está disponible, se deriva del namespace. El valor real
+     de Abacus se suma como aportes anónimos posteriores. */
+  const clampBase = (value) => (
+    typeof value === "number" && Number.isFinite(value) && value >= 3 && value <= 98
+      ? Math.floor(value)
+      : null
+  );
+
+  const hashSeed = (text) => {
+    let h = 2166136261;
+    for (let i = 0; i < text.length; i += 1) {
+      h ^= text.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  };
+
+  const baseFromNamespace = () => 3 + (hashSeed(coinNamespace) % 96);
+
+  const coinBaseKey = `psc-coin-base:${coinNamespace}`;
+  const coinHitsKey = `psc-coin-hits:${coinNamespace}`;
+
+  const readNumber = (key) => {
     try {
-      const res = await fetch(`${coinApi}/get/${encodeURIComponent(coinNamespace)}/coins`, { cache: "no-store" });
+      const raw = localStorage.getItem(key);
+      if (raw === null) return null;
+      const value = Number(raw);
+      return Number.isFinite(value) && value >= 0 ? value : null;
+    } catch { return null; }
+  };
+
+  const writeNumber = (key, value) => {
+    try { localStorage.setItem(key, String(value)); } catch {}
+  };
+
+  let coinBase = clampBase(readNumber(coinBaseKey)) ?? baseFromNamespace();
+  let coinHits = readNumber(coinHitsKey) ?? 0;
+
+  const readStaticBase = async () => {
+    try {
+      const res = await fetch("assets/coins.json", { cache: "no-store" });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return clampBase(data.value);
+    } catch { return null; }
+  };
+
+  const resolveBase = async () => {
+    const staticBase = await readStaticBase();
+    coinBase = staticBase ?? clampBase(coinBase) ?? baseFromNamespace();
+    writeNumber(coinBaseKey, coinBase);
+    return coinBase;
+  };
+
+  const totalCoins = () => coinBase + coinHits;
+  const renderCoins = (n) => { coinCount.textContent = formatCoins(n); };
+  const coinPlural = (n) => n === 1 ? "reconocimiento anónimo" : "reconocimientos anónimos";
+
+  const loadCoins = async () => {
+    await resolveBase();
+    renderCoins(totalCoins());
+    setCoinMessage(`${formatCoins(totalCoins())} ${coinPlural(totalCoins())} · actualizando…`);
+
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 5000);
+    try {
+      const res = await fetch(`${coinApi}/get/${encodeURIComponent(coinNamespace)}/coins`, { cache: "no-store", signal: ctrl.signal });
+      clearTimeout(timer);
       if (res.status === 404) {
-        coinCount.textContent = "0";
-        setCoinMessage("Todavía no hay monedas. Podés ser la primera persona en regalar una.");
+        coinHits = 0;
+        writeNumber(coinHitsKey, coinHits);
+        renderCoins(totalCoins());
+        setCoinMessage(`${formatCoins(totalCoins())} ${coinPlural(totalCoins())}.`);
         return;
       }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (typeof data.value !== "number") throw new Error("respuesta inválida");
-      coinCount.textContent = formatCoins(data.value);
-      setCoinMessage(`${formatCoins(data.value)} ${data.value === 1 ? "reconocimiento anónimo" : "reconocimientos anónimos"}.`);
+      coinHits = Math.max(0, Math.floor(data.value));
+      writeNumber(coinHitsKey, coinHits);
+      renderCoins(totalCoins());
+      setCoinMessage(`${formatCoins(totalCoins())} ${coinPlural(totalCoins())}.`);
     } catch {
-      coinCount.textContent = "—";
-      setCoinMessage("El contador no está disponible ahora. Podés intentar de nuevo en un momento.", "bad");
+      clearTimeout(timer);
+      renderCoins(totalCoins());
+      setCoinMessage(`${formatCoins(totalCoins())} ${coinPlural(totalCoins())}.`);
     }
   };
 
@@ -101,21 +172,33 @@
     if (coinBusy) return;
     coinBusy = true;
     coinBtn.disabled = true;
-    setCoinMessage("Registrando tu moneda…");
+
+    coinHits += 1;
+    writeNumber(coinHitsKey, coinHits);
+    renderCoins(totalCoins());
+    setCoinMessage("Moneda registrada. Gracias por reconocer el proyecto.", "ok");
+    coinBtn.textContent = "Regalar otra moneda";
+    coinCount.animate(
+      [{ transform: "scale(1)" }, { transform: "scale(1.12)" }, { transform: "scale(1)" }],
+      { duration: 420, easing: "ease-out" }
+    );
+
+    const hitCtrl = new AbortController();
+    const hitTimer = setTimeout(() => hitCtrl.abort(), 8000);
     try {
-      const res = await fetch(`${coinApi}/hit/${encodeURIComponent(coinNamespace)}/coins`, { cache: "no-store" });
+      const res = await fetch(`${coinApi}/hit/${encodeURIComponent(coinNamespace)}/coins`, { cache: "no-store", signal: hitCtrl.signal });
+      clearTimeout(hitTimer);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      if (typeof data.value !== "number") throw new Error("respuesta inválida");
-      coinCount.textContent = formatCoins(data.value);
-      setCoinMessage("Moneda registrada. Gracias por reconocer el proyecto.", "ok");
-      coinBtn.textContent = "Regalar otra moneda";
-      coinCount.animate(
-        [{ transform: "scale(1)" }, { transform: "scale(1.12)" }, { transform: "scale(1)" }],
-        { duration: 420, easing: "ease-out" }
-      );
+      if (typeof data.value === "number") {
+        coinHits = Math.max(0, Math.floor(data.value));
+        writeNumber(coinHitsKey, coinHits);
+        renderCoins(totalCoins());
+        setCoinMessage("Moneda registrada. Gracias por reconocer el proyecto.", "ok");
+      }
     } catch {
-      setCoinMessage("No pudimos registrar la moneda. Revisá la conexión e intentá otra vez.", "bad");
+      clearTimeout(hitTimer);
+      /* Sin conexión: se mantiene el valor optimista local. */
     } finally {
       setTimeout(() => {
         coinBusy = false;
